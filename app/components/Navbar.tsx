@@ -28,7 +28,8 @@ const Navbar = ({ onNavigate }: NavbarProps) => {
                 onError={(e) => {
                   // Fallback to Methodist-themed design if image fails to load
                   e.currentTarget.style.display = 'none'
-                  e.currentTarget.nextElementSibling.style.display = 'flex'
+                  const fallback = e.currentTarget.nextElementSibling as HTMLElement
+                  if (fallback) fallback.style.display = 'flex'
                 }}
               />
               <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-800 to-blue-600 border-2 border-yellow-400 hidden items-center justify-center text-white shadow-lg">

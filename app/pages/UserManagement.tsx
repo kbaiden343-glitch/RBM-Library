@@ -15,7 +15,7 @@ interface User {
 }
 
 const UserManagement = () => {
-  const { user, hasPermission } = useAuth()
+  const { hasPermission } = useAuth()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')

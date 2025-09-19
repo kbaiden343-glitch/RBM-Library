@@ -9,7 +9,7 @@ const MemberManagement = () => {
   const { members } = state
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
-  const [editingMember, setEditingMember] = useState(null)
+  const [editingMember, setEditingMember] = useState<any>(null)
 
   // Refresh members when component mounts
   useEffect(() => {
@@ -21,19 +21,19 @@ const MemberManagement = () => {
     member.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleAddMember = async (memberData) => {
+  const handleAddMember = async (memberData: any) => {
     await addMember(memberData)
     setShowAddModal(false)
     // Refresh the members list to show the new member
     setTimeout(() => fetchMembers(), 500)
   }
 
-  const handleEditMember = async (memberData) => {
+  const handleEditMember = async (memberData: any) => {
     await updateMember(memberData)
     setEditingMember(null)
   }
 
-  const handleDeleteMember = async (memberId) => {
+  const handleDeleteMember = async (memberId: string) => {
     if (confirm('Are you sure you want to delete this member? This action cannot be undone.')) {
       await deleteMember(memberId)
     }
@@ -126,7 +126,7 @@ const MemberManagement = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900 capitalize">{member.personType || 'Member'}</div>
+                    <div className="text-sm text-gray-900 capitalize">Member</div>
                     <div className="text-sm text-gray-500 flex items-center">
                       <Calendar className="h-3 w-3 mr-1" />
                       Joined {member.membershipDate ? new Date(member.membershipDate).toLocaleDateString() : 'Unknown'}
@@ -179,7 +179,7 @@ const MemberManagement = () => {
             <h2 className="text-xl font-semibold mb-4">Add New Member</h2>
             <form onSubmit={(e) => {
               e.preventDefault()
-              const formData = new FormData(e.target)
+              const formData = new FormData(e.target as HTMLFormElement)
               handleAddMember({
                 name: formData.get('name'),
                 email: formData.get('email'),

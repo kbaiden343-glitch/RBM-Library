@@ -41,7 +41,7 @@ const BorrowingSystem = () => {
     )
   })
 
-  const handleBorrowBook = (borrowingData) => {
+  const handleBorrowBook = (borrowingData: any) => {
     const dueDate = new Date()
     dueDate.setDate(dueDate.getDate() + 14) // 14 days from now
     
@@ -53,7 +53,7 @@ const BorrowingSystem = () => {
     setShowBorrowModal(false)
   }
 
-  const handleReturnBook = (borrowingId) => {
+  const handleReturnBook = (borrowingId: string) => {
     returnBook(borrowingId)
   }
 
@@ -233,7 +233,7 @@ const BorrowingSystem = () => {
             <h2 className="text-xl font-semibold mb-4">Borrow Book</h2>
             <form onSubmit={(e) => {
               e.preventDefault()
-              const formData = new FormData(e.target)
+              const formData = new FormData(e.target as HTMLFormElement)
               handleBorrowBook({
                 bookId: formData.get('bookId'),
                 memberId: formData.get('memberId')

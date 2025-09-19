@@ -8,7 +8,7 @@ const QRScanner = () => {
   const [scanResult, setScanResult] = useState(null)
   const [scanError, setScanError] = useState(null)
 
-  const handleScan = (result) => {
+  const handleScan = (result: any) => {
     if (result) {
       setScanResult(result)
       setIsScanning(false)
@@ -16,7 +16,7 @@ const QRScanner = () => {
     }
   }
 
-  const handleError = (error) => {
+  const handleError = (error: any) => {
     setScanError(error)
     setIsScanning(false)
   }

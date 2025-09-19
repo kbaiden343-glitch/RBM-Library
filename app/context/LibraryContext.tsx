@@ -85,6 +85,7 @@ type LibraryAction =
   | { type: 'SET_MEMBERS'; payload: Member[] }
   | { type: 'ADD_MEMBER'; payload: Member }
   | { type: 'UPDATE_MEMBER'; payload: Member }
+  | { type: 'DELETE_MEMBER'; payload: string }
   | { type: 'SET_BORROWINGS'; payload: Borrowing[] }
   | { type: 'ADD_BORROWING'; payload: Borrowing }
   | { type: 'RETURN_BOOK'; payload: Borrowing }
@@ -261,7 +262,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         phone: person.phone || '',
         address: person.address || '',
         membershipDate: person.membershipDate || person.createdAt,
-        status: person.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+        status: (person.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
         createdAt: person.createdAt,
         updatedAt: person.updatedAt,
       })) || []
@@ -428,7 +429,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
           phone: newPerson.phone || '',
           address: newPerson.address || '',
           membershipDate: newPerson.membershipDate || newPerson.createdAt,
-          status: newPerson.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+          status: (newPerson.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
           createdAt: newPerson.createdAt,
           updatedAt: newPerson.updatedAt,
         }
@@ -473,7 +474,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
           phone: updatedPerson.phone || '',
           address: updatedPerson.address || '',
           membershipDate: updatedPerson.membershipDate || updatedPerson.createdAt,
-          status: updatedPerson.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+          status: (updatedPerson.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
           createdAt: updatedPerson.createdAt,
           updatedAt: updatedPerson.updatedAt,
         }

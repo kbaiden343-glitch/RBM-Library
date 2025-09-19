@@ -77,7 +77,11 @@ const ImportExportModal = ({ isOpen, onClose, mode }: ImportExportModalProps) =>
           error.includes(`Row ${importData.indexOf(book) + 2}`)
         )
         if (errors.length === 0) {
-          addBook(book)
+          const bookToAdd = {
+            ...book,
+            status: book.status || 'AVAILABLE' as const
+          }
+          addBook(bookToAdd)
           importedCount++
         }
       }
@@ -329,9 +333,9 @@ const ImportExportModal = ({ isOpen, onClose, mode }: ImportExportModalProps) =>
                 <h4 className="font-medium text-gray-900 mb-2">Export Information</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
                   <li>• Total books to export: {state.books.length}</li>
-                  <li>• Available books: {state.books.filter(b => b.status === 'available').length}</li>
-                  <li>• Borrowed books: {state.books.filter(b => b.status === 'borrowed').length}</li>
-                  <li>• Reserved books: {state.books.filter(b => b.status === 'reserved').length}</li>
+                  <li>• Available books: {state.books.filter(b => b.status === 'AVAILABLE').length}</li>
+                  <li>• Borrowed books: {state.books.filter(b => b.status === 'BORROWED').length}</li>
+                  <li>• Reserved books: {state.books.filter(b => b.status === 'RESERVED').length}</li>
                 </ul>
               </div>
 

@@ -12,11 +12,11 @@ const Reports = () => {
   // Calculate statistics
   const totalBooks = books.length
   const totalMembers = members.length
-  const activeBorrowings = borrowings.filter(b => b.status === 'borrowed').length
+  const activeBorrowings = borrowings.filter(b => b.status === 'BORROWED').length
   const overdueBooks = borrowings.filter(b => {
     const dueDate = new Date(b.dueDate)
     const today = new Date()
-    return dueDate < today && b.status === 'borrowed'
+    return dueDate < today && b.status === 'BORROWED'
   }).length
 
   const today = new Date()
@@ -30,7 +30,7 @@ const Reports = () => {
   ).length
 
   // Category distribution
-  const categoryStats = books.reduce((acc, book) => {
+  const categoryStats = books.reduce((acc: Record<string, number>, book) => {
     acc[book.category] = (acc[book.category] || 0) + 1
     return acc
   }, {})

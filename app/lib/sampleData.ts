@@ -6,7 +6,7 @@ export const generateSampleBooks = () => [
     category: "fiction",
     publishedYear: 1925,
     description: "A classic American novel about the Jazz Age",
-    status: "available" as const
+    status: "AVAILABLE" as const
   },
   {
     title: "1984",
@@ -15,7 +15,7 @@ export const generateSampleBooks = () => [
     category: "fiction",
     publishedYear: 1949,
     description: "A dystopian social science fiction novel",
-    status: "borrowed" as const
+    status: "BORROWED" as const
   },
   {
     title: "To Kill a Mockingbird",
@@ -24,7 +24,7 @@ export const generateSampleBooks = () => [
     category: "fiction",
     publishedYear: 1960,
     description: "A novel about racial injustice in the American South",
-    status: "available" as const
+    status: "AVAILABLE" as const
   },
   {
     title: "A Brief History of Time",
@@ -33,7 +33,7 @@ export const generateSampleBooks = () => [
     category: "science",
     publishedYear: 1988,
     description: "A landmark volume in science writing",
-    status: "available" as const
+    status: "AVAILABLE" as const
   },
   {
     title: "Sapiens",
@@ -42,7 +42,7 @@ export const generateSampleBooks = () => [
     category: "history",
     publishedYear: 2011,
     description: "A brief history of humankind",
-    status: "reserved" as const
+    status: "RESERVED" as const
   },
   {
     title: "The Catcher in the Rye",
@@ -51,7 +51,7 @@ export const generateSampleBooks = () => [
     category: "fiction",
     publishedYear: 1951,
     description: "A coming-of-age story",
-    status: "available" as const
+    status: "AVAILABLE" as const
   },
   {
     title: "Pride and Prejudice",
@@ -60,7 +60,7 @@ export const generateSampleBooks = () => [
     category: "fiction",
     publishedYear: 1813,
     description: "A romantic novel of manners",
-    status: "borrowed" as const
+    status: "BORROWED" as const
   },
   {
     title: "The Art of War",
@@ -69,7 +69,7 @@ export const generateSampleBooks = () => [
     category: "philosophy",
     publishedYear: -500,
     description: "An ancient Chinese military treatise",
-    status: "available" as const
+    status: "AVAILABLE" as const
   }
 ]
 
@@ -79,36 +79,32 @@ export const generateSampleMembers = () => [
     email: "john.doe@email.com",
     phone: "+1234567890",
     address: "123 Main St, City, State",
-    membershipType: "adult" as const,
-    joinDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "active" as const
+    membershipDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "ACTIVE" as const
   },
   {
     name: "Jane Smith",
     email: "jane.smith@email.com",
     phone: "+1234567891",
     address: "456 Oak Ave, City, State",
-    membershipType: "student" as const,
-    joinDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "active" as const
+    membershipDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "ACTIVE" as const
   },
   {
     name: "Mike Johnson",
     email: "mike.johnson@email.com",
     phone: "+1234567892",
     address: "789 Pine Rd, City, State",
-    membershipType: "senior" as const,
-    joinDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "active" as const
+    membershipDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "ACTIVE" as const
   },
   {
     name: "Sarah Wilson",
     email: "sarah.wilson@email.com",
     phone: "+1234567893",
     address: "321 Elm St, City, State",
-    membershipType: "adult" as const,
-    joinDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "active" as const
+    membershipDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+    status: "ACTIVE" as const
   }
 ]
 
@@ -118,14 +114,14 @@ export const generateSampleBorrowings = (bookIds: string[], memberIds: string[])
     memberId: memberIds[0], // John Doe
     borrowDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "borrowed" as const
+    status: "BORROWED" as const
   },
   {
     bookId: bookIds[6], // Pride and Prejudice
     memberId: memberIds[1], // Jane Smith
     borrowDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "borrowed" as const
+    status: "BORROWED" as const
   },
   {
     bookId: bookIds[0], // The Great Gatsby

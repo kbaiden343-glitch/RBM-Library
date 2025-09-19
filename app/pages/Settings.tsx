@@ -29,13 +29,13 @@ const Settings = () => {
     { id: 'appearance', label: 'Appearance', icon: Palette }
   ]
 
-  const handleSettingChange = (key, value) => {
+  const handleSettingChange = (key: string, value: any) => {
     if (key.includes('.')) {
       const [parent, child] = key.split('.')
       setSettings(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent],
+          ...(prev as any)[parent],
           [child]: value
         }
       }))

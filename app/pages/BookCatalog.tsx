@@ -15,7 +15,7 @@ const BookCatalog = () => {
   const [filterStatus, setFilterStatus] = useState('all')
   const [sortBy, setSortBy] = useState('title')
   const [showAddModal, setShowAddModal] = useState(false)
-  const [editingBook, setEditingBook] = useState(null)
+  const [editingBook, setEditingBook] = useState<any>(null)
   const [viewMode, setViewMode] = useState('grid')
   const [selectedBooks, setSelectedBooks] = useState<string[]>([])
   const [showImportModal, setShowImportModal] = useState(false)
@@ -46,17 +46,17 @@ const BookCatalog = () => {
     }
   })
 
-  const handleAddBook = async (bookData) => {
+  const handleAddBook = async (bookData: any) => {
     await addBook(bookData)
     setShowAddModal(false)
   }
 
-  const handleEditBook = async (bookData) => {
+  const handleEditBook = async (bookData: any) => {
     await updateBook(bookData)
     setEditingBook(null)
   }
 
-  const handleDeleteBook = async (bookId) => {
+  const handleDeleteBook = async (bookId: string) => {
     if (confirm('Are you sure you want to delete this book?')) {
       await deleteBook(bookId)
     }
@@ -427,7 +427,7 @@ const BookCatalog = () => {
             <h2 className="text-xl font-semibold mb-4">Add New Book</h2>
             <form onSubmit={(e) => {
               e.preventDefault()
-              const formData = new FormData(e.target)
+              const formData = new FormData(e.target as HTMLFormElement)
               handleAddBook({
                 title: formData.get('title')?.toString() || '',
                 author: formData.get('author')?.toString() || '',
@@ -514,7 +514,7 @@ const BookCatalog = () => {
             <h2 className="text-xl font-semibold mb-4">Edit Book</h2>
             <form onSubmit={(e) => {
               e.preventDefault()
-              const formData = new FormData(e.target)
+              const formData = new FormData(e.target as HTMLFormElement)
               handleEditBook({
                 ...editingBook,
                 title: formData.get('title')?.toString() || '',

@@ -5,7 +5,7 @@ export interface BookImportData {
   category: string
   publishedYear: number
   description?: string
-  status?: 'available' | 'borrowed' | 'reserved'
+  status?: 'AVAILABLE' | 'BORROWED' | 'RESERVED'
 }
 
 export interface ImportResult {
@@ -49,6 +49,17 @@ export const downloadFile = (content: string, filename: string, mimeType: string
   URL.revokeObjectURL(url)
 }
 
+const convertStatus = (status: string): 'AVAILABLE' | 'BORROWED' | 'RESERVED' | undefined => {
+  if (!status) return undefined
+  const lower = status.toLowerCase()
+  switch (lower) {
+    case 'available': return 'AVAILABLE'
+    case 'borrowed': return 'BORROWED'
+    case 'reserved': return 'RESERVED'
+    default: return undefined
+  }
+}
+
 export const parseCSV = (csvText: string): BookImportData[] => {
   const lines = csvText.split('\n').filter(line => line.trim())
   if (lines.length < 2) return []
@@ -67,7 +78,7 @@ export const parseCSV = (csvText: string): BookImportData[] => {
       category: values[3] || 'fiction',
       publishedYear: parseInt(values[4]) || new Date().getFullYear(),
       description: values[6] || '',
-      status: (values[5] as 'available' | 'borrowed' | 'reserved') || 'available'
+      status: convertStatus(values[5]) || 'AVAILABLE'
     }
     
     books.push(book)

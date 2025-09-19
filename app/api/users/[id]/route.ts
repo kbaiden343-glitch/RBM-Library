@@ -23,6 +23,10 @@ export async function GET(
     }
 
     const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
     const adminUser = await prisma.user.findUnique({
       where: { id: decoded.userId },
     })
@@ -70,6 +74,10 @@ export async function PUT(
     }
 
     const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
     const adminUser = await prisma.user.findUnique({
       where: { id: decoded.userId },
     })
@@ -157,6 +165,10 @@ export async function DELETE(
     }
 
     const decoded = verifyToken(token)
+    if (!decoded) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    }
+
     const adminUser = await prisma.user.findUnique({
       where: { id: decoded.userId },
     })

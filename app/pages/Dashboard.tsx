@@ -117,7 +117,7 @@ const Dashboard = () => {
 
     // Recent returns
     const recentReturns = borrowings
-      .filter(b => b.status === 'returned' && b.returnDate)
+      .filter(b => b.status === 'RETURNED' && b.returnDate)
       .sort((a, b) => new Date(b.returnDate!).getTime() - new Date(a.returnDate!).getTime())
       .slice(0, 3)
       .map(borrowing => {

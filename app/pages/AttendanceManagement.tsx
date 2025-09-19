@@ -49,6 +49,14 @@ const AttendanceManagement = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [showAddPersonModal, setShowAddPersonModal] = useState(false)
+  const [showVisitorModal, setShowVisitorModal] = useState(false)
+  const [members, setMembers] = useState<Person[]>([])
+  
+  // Add missing function
+  const handleMemberCheckIn = async (memberId: string) => {
+    // Implementation for member check-in
+    console.log('Check in member:', memberId)
+  }
 
   // Check if user has librarian or admin permissions
   if (!hasPermission('manage_attendance')) {

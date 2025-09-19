@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(MEMBER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Book {
+  id            String        @id @default(cuid())
+  title         String
+  author        String
+  isbn          String        @unique
+  category      String
+  status        BookStatus    @default(AVAILABLE)
+  publishedYear Int
+  description   String?
+  coverImage    String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  borrowings    Borrowing[]
+  reservations  Reservation[]
+
+  @@map("books")
+}
+
+model Person {
+  id               String        @id @default(cuid())
+  name             String
+  email            String        @unique
+  phone            String?
+  address          String?
+  personType       PersonType    @default(VISITOR)
+  membershipDate   DateTime?
+  status           PersonStatus  @default(ACTIVE)
+  notes            String?
+  emergencyContact String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  libraryId        String?       @unique
+  attendance       Attendance[]
+  borrowings       Borrowing[]
+  reservations     Reservation[]
+
+  @@map("persons")
+}
+
+model Member {
+  id             String        @id @default(cuid())
+  name           String
+  email          String        @unique
+  phone          String
+  address        String
+  membershipDate DateTime      @default(now())
+  status         MemberStatus  @default(ACTIVE)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  attendance     Attendance[]
+  borrowings     Borrowing[]
+  reservations   Reservation[]
+
+  @@map("members")
+}
+
+model Borrowing {
+  id         String          @id @default(cuid())
+  bookId     String
+  memberId   String?
+  borrowDate DateTime        @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  status     BorrowingStatus @default(BORROWED)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  personId   String?
+  book       Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  member     Member?         @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  person     Person?         @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@map("borrowings")
+}
+
+model Reservation {
+  id              String            @id @default(cuid())
+  bookId          String
+  memberId        String?
+  reservationDate DateTime          @default(now())
+  status          ReservationStatus @default(WAITING)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  personId        String?
+  book            Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  member          Member?           @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  person          Person?           @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@map("reservations")
+}
+
+model Attendance {
+  id           String    @id @default(cuid())
+  memberId     String?
+  checkInTime  DateTime  @default(now())
+  createdAt    DateTime  @default(now())
+  checkOutTime DateTime?
+  isVisitor    Boolean   @default(false)
+  updatedAt    DateTime  @default(now()) @updatedAt
+  visitorEmail String?
+  visitorName  String?
+  visitorPhone String?
+  personId     String?
+  member       Member?   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  person       Person?   @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@map("attendance")
+}
+
+enum Role {
+  ADMIN
+  LIBRARIAN
+  MEMBER
+}
+
+enum BookStatus {
+  AVAILABLE
+  BORROWED
+  RESERVED
+}
+
+enum PersonType {
+  MEMBER
+  VISITOR
+  VIP
+  STUDENT
+  STAFF
+}
+
+enum PersonStatus {
+  ACTIVE
+  INACTIVE
+  BANNED
+  SUSPENDED
+}
+
+enum MemberStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BorrowingStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+}
+
+enum ReservationStatus {
+  WAITING
+  READY
+  CANCELLED
+}

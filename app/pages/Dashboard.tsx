@@ -201,7 +201,7 @@ const Dashboard = () => {
       action: () => {
         const memberId = members[0]?.id
         if (memberId) {
-          addAttendance({ memberId })
+          addAttendance({ personId: memberId })
         }
       },
       color: 'bg-purple-500',

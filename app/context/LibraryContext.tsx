@@ -66,21 +66,26 @@ interface Borrowing {
 interface Reservation {
   id: string
   bookId: string
-  memberId: string
+  personId: string
+  memberId?: string // Keep for backward compatibility
   reservationDate: string
   status: 'WAITING' | 'READY' | 'CANCELLED'
   createdAt?: string
   updatedAt?: string
   book?: Book
-  member?: Member
+  person?: Person
+  member?: Member // Keep for backward compatibility
 }
 
 interface Attendance {
   id: string
-  memberId: string
+  personId: string
+  memberId?: string // Keep for backward compatibility
   checkInTime: string
+  checkOutTime?: string
   createdAt?: string
-  member?: Member
+  person?: Person
+  member?: Member // Keep for backward compatibility
 }
 
 interface LibraryState {

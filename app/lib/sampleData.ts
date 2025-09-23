@@ -111,21 +111,21 @@ export const generateSampleMembers = () => [
 export const generateSampleBorrowings = (bookIds: string[], memberIds: string[]) => [
   {
     bookId: bookIds[1], // 1984
-    memberId: memberIds[0], // John Doe
+    personId: memberIds[0], // John Doe
     borrowDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString(),
     status: "BORROWED" as const
   },
   {
     bookId: bookIds[6], // Pride and Prejudice
-    memberId: memberIds[1], // Jane Smith
+    personId: memberIds[1], // Jane Smith
     borrowDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000).toISOString(),
     status: "BORROWED" as const
   },
   {
     bookId: bookIds[0], // The Great Gatsby
-    memberId: memberIds[2], // Mike Johnson
+    personId: memberIds[2], // Mike Johnson
     borrowDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     returnDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
@@ -135,16 +135,16 @@ export const generateSampleBorrowings = (bookIds: string[], memberIds: string[])
 
 export const generateSampleAttendance = (memberIds: string[]) => [
   {
-    memberId: memberIds[0], // John Doe
+    personId: memberIds[0], // John Doe
     checkInTime: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
     checkOutTime: new Date(Date.now() - 1 * 60 * 60 * 1000).toISOString() // 1 hour ago
   },
   {
-    memberId: memberIds[1], // Jane Smith
+    personId: memberIds[1], // Jane Smith
     checkInTime: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString() // 4 hours ago
   },
   {
-    memberId: memberIds[3], // Sarah Wilson
+    personId: memberIds[3], // Sarah Wilson
     checkInTime: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() // 6 hours ago
   }
 ]
@@ -152,7 +152,7 @@ export const generateSampleAttendance = (memberIds: string[]) => [
 export const generateSampleReservations = (bookIds: string[], memberIds: string[]) => [
   {
     bookId: bookIds[4], // Sapiens
-    memberId: memberIds[2], // Mike Johnson
+    personId: memberIds[2], // Mike Johnson
     reservationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     status: "waiting" as const
   }

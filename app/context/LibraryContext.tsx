@@ -26,6 +26,23 @@ interface Member {
   address: string
   membershipDate: string
   status: 'ACTIVE' | 'INACTIVE'
+  personType?: 'MEMBER' | 'VISITOR' | 'STUDENT' | 'VIP' | 'STAFF' // Include person type
+  createdAt?: string
+  updatedAt?: string
+}
+
+interface Person {
+  id: string
+  name: string
+  email: string
+  phone?: string
+  address?: string
+  personType: 'MEMBER' | 'VISITOR' | 'STUDENT' | 'VIP' | 'STAFF'
+  membershipDate?: string
+  status: 'ACTIVE' | 'INACTIVE'
+  notes?: string
+  emergencyContact?: string
+  libraryId?: string
   createdAt?: string
   updatedAt?: string
 }
@@ -33,7 +50,8 @@ interface Member {
 interface Borrowing {
   id: string
   bookId: string
-  memberId: string
+  personId: string
+  memberId?: string // Keep for backward compatibility
   borrowDate: string
   dueDate: string
   returnDate?: string
@@ -41,7 +59,8 @@ interface Borrowing {
   createdAt?: string
   updatedAt?: string
   book?: Book
-  member?: Member
+  person?: Person
+  member?: Member // Keep for backward compatibility
 }
 
 interface Reservation {
@@ -252,8 +271,8 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
   const fetchMembers = async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true })
-      // Use the new persons API and filter for members only
-      const data = await apiCall('/api/persons?personType=MEMBER&limit=100')
+      // Use the new persons API and fetch all person types for borrowing
+      const data = await apiCall('/api/persons?limit=100')
       // Convert persons to member format for backward compatibility
       const membersData = data.persons?.map((person: any) => ({
         id: person.id,
@@ -263,6 +282,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         address: person.address || '',
         membershipDate: person.membershipDate || person.createdAt,
         status: (person.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
+        personType: person.personType, // Include person type
         createdAt: person.createdAt,
         updatedAt: person.updatedAt,
       })) || []
@@ -526,7 +546,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         addNotification({
           type: 'success',
           title: 'Book Borrowed',
-          message: `Book ID ${borrowing.bookId} borrowed by Member ID ${borrowing.memberId}.`
+          message: `Book ID ${borrowing.bookId} borrowed by Member ID ${borrowing.memberId || borrowing.personId}.`
         })
       } catch (error) {
         console.error('Error borrowing book:', error)

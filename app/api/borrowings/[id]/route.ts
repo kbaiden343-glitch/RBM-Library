@@ -11,7 +11,7 @@ export async function GET(
       where: { id: params.id },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 
@@ -88,7 +88,7 @@ async function returnBook(borrowingId: string) {
       },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 

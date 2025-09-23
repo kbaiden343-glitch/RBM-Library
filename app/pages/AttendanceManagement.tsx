@@ -54,8 +54,31 @@ const AttendanceManagement = () => {
   
   // Add missing function
   const handleMemberCheckIn = async (memberId: string) => {
-    // Implementation for member check-in
-    console.log('Check in member:', memberId)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          action: 'check-in',
+          personId: memberId, // Use personId since we're using the unified Person model
+        }),
+      })
+
+      if (response.ok) {
+        toast.success('Person checked in successfully!')
+        fetchTodayAttendance() // Refresh the attendance list
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || 'Failed to check in person')
+      }
+    } catch (error) {
+      console.error('Error checking in person:', error)
+      toast.error('Failed to check in person')
+    }
   }
 
   // Check if user has librarian or admin permissions

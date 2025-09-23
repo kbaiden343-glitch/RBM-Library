@@ -105,7 +105,7 @@ const Dashboard = () => {
       .slice(0, 5)
       .map(borrowing => {
         const book = books.find(b => b.id === borrowing.bookId)
-        const member = members.find(m => m.id === borrowing.memberId)
+        const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
         return {
           type: 'borrow',
           message: `${member?.name || 'Unknown'} borrowed "${book?.title || 'Unknown Book'}"`,
@@ -122,7 +122,7 @@ const Dashboard = () => {
       .slice(0, 3)
       .map(borrowing => {
         const book = books.find(b => b.id === borrowing.bookId)
-        const member = members.find(m => m.id === borrowing.memberId)
+        const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
         return {
           type: 'return',
           message: `${member?.name || 'Unknown'} returned "${book?.title || 'Unknown Book'}"`,

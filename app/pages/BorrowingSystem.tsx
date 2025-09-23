@@ -27,7 +27,7 @@ const BorrowingSystem = () => {
   // Filter borrowings based on search term
   const filteredBorrowings = activeBorrowings.filter(borrowing => {
     const book = books.find(b => b.id === borrowing.bookId)
-    const member = members.find(m => m.id === borrowing.memberId)
+    const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
     
     if (!searchTerm) return true
     
@@ -45,11 +45,17 @@ const BorrowingSystem = () => {
     const dueDate = new Date()
     dueDate.setDate(dueDate.getDate() + 14) // 14 days from now
     
-    borrowBook({
+    console.log('Borrowing data:', borrowingData) // Debug log
+    
+    const borrowingPayload = {
       bookId: borrowingData.bookId,
-      memberId: borrowingData.memberId,
+      personId: borrowingData.personId || borrowingData.memberId,
       dueDate: dueDate.toISOString()
-    })
+    }
+    
+    console.log('Borrowing payload:', borrowingPayload) // Debug log
+    
+    borrowBook(borrowingPayload)
     setShowBorrowModal(false)
   }
 
@@ -158,7 +164,7 @@ const BorrowingSystem = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredBorrowings.map((borrowing) => {
                 const book = books.find(b => b.id === borrowing.bookId)
-                const member = members.find(m => m.id === borrowing.memberId)
+                const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
                 const isOverdue = new Date(borrowing.dueDate) < new Date()
                 
                 return (
@@ -236,7 +242,7 @@ const BorrowingSystem = () => {
               const formData = new FormData(e.target as HTMLFormElement)
               handleBorrowBook({
                 bookId: formData.get('bookId'),
-                memberId: formData.get('memberId')
+                personId: formData.get('personId')
               })
             }}>
               <div className="space-y-4">
@@ -253,7 +259,7 @@ const BorrowingSystem = () => {
                   ))}
                 </select>
                 <select
-                  name="memberId"
+                  name="personId"
                   required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                 >

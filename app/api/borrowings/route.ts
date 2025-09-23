@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
     }
     
     if (memberId) {
-      where.memberId = memberId
+      where.OR = [
+        { memberId: memberId },
+        { personId: memberId }
+      ]
     }
     
     if (bookId) {
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           book: true,
-          member: true,
+          person: true,
         },
       }),
       prisma.borrowing.count({ where }),
@@ -84,29 +87,29 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if member exists and is active
-    const member = await prisma.member.findUnique({
-      where: { id: borrowingData.memberId },
+    // Check if person exists and is active (using unified Person model)
+    const person = await prisma.person.findUnique({
+      where: { id: borrowingData.personId },
     })
 
-    if (!member) {
+    if (!person) {
       return NextResponse.json(
-        { error: 'Member not found' },
+        { error: 'Person not found' },
         { status: 404 }
       )
     }
 
-    if (member.status !== 'ACTIVE') {
+    if (person.status !== 'ACTIVE') {
       return NextResponse.json(
-        { error: 'Member is not active' },
+        { error: 'Person is not active' },
         { status: 400 }
       )
     }
 
-    // Check if member has reached borrowing limit (e.g., 5 books)
+    // Check if person has reached borrowing limit (e.g., 5 books)
     const activeBorrowings = await prisma.borrowing.count({
       where: {
-        memberId: borrowingData.memberId,
+        personId: borrowingData.personId,
         status: 'BORROWED',
       },
     })
@@ -122,12 +125,12 @@ export async function POST(request: NextRequest) {
     const borrowing = await prisma.borrowing.create({
       data: {
         bookId: borrowingData.bookId,
-        memberId: borrowingData.memberId,
+        personId: borrowingData.personId,
         dueDate: new Date(borrowingData.dueDate),
       },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 

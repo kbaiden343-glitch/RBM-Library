@@ -44,7 +44,7 @@ export const updateMemberSchema = memberSchema.partial().extend({
 // Borrowing validation schemas
 export const borrowingSchema = z.object({
   bookId: z.string(),
-  memberId: z.string(),
+  personId: z.string(),
   dueDate: z.string().datetime(),
 })
 

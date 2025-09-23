@@ -10,7 +10,7 @@ export async function GET(
       where: { id: params.id },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 
@@ -88,7 +88,7 @@ async function cancelReservation(reservationId: string) {
       data: { status: 'CANCELLED' },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 
@@ -138,7 +138,7 @@ async function markReservationReady(reservationId: string) {
       data: { status: 'READY' },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 

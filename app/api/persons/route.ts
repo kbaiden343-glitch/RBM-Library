@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '../../../lib/db'
-import { generatePersonID } from '../../lib/idGenerator'
 
 export async function GET(request: NextRequest) {
   try {
@@ -87,7 +86,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { 
           error: `A ${existingPerson.personType.toLowerCase()} with email "${email}" already exists`,
-          details: `Person: ${existingPerson.name} (${existingPerson.libraryId || 'No ID'})`
+          details: `Person: ${existingPerson.name}`
         },
         { status: 409 }
       )
@@ -103,13 +102,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Generate unique library ID
-    const libraryId = generatePersonID(personType || 'VISITOR')
-
     // Create person record
     const person = await prisma.person.create({
       data: {
-        libraryId,
         name,
         email,
         phone: phone || null,
@@ -125,7 +120,6 @@ export async function POST(request: NextRequest) {
       id: person.id, 
       name: person.name, 
       email: person.email, 
-      libraryId: person.libraryId,
       personType: person.personType 
     })
 
@@ -137,14 +131,8 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error) {
       if (error.message.includes('Unique constraint failed')) {
         return NextResponse.json(
-          { error: 'A person with this email or library ID already exists' },
+          { error: 'A person with this email already exists' },
           { status: 409 }
-        )
-      }
-      if (error.message.includes('libraryId')) {
-        return NextResponse.json(
-          { error: 'Library ID field is not available. Please contact system administrator.' },
-          { status: 500 }
         )
       }
     }

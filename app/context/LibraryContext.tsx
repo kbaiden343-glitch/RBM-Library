@@ -2,7 +2,6 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { useNotifications } from './NotificationContext'
 
 interface Book {
   id: string
@@ -256,7 +255,6 @@ const apiCall = async (url: string, options: RequestInit = {}) => {
 
 export const LibraryProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(libraryReducer, initialState)
-  const { addNotification } = useNotifications()
 
   // Fetch functions
   const fetchBooks = async () => {
@@ -376,11 +374,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'ADD_BOOK', payload: newBook })
         toast.success('Book added successfully!')
-        addNotification({
-          type: 'success',
-          title: 'New Book Added',
-          message: `"${book.title}" by ${book.author} has been added to the catalog.`
-        })
       } catch (error) {
         console.error('Error adding book:', error)
         toast.error('Failed to add book')
@@ -397,11 +390,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'UPDATE_BOOK', payload: updatedBook })
         toast.success('Book updated successfully!')
-        addNotification({
-          type: 'info',
-          title: 'Book Updated',
-          message: `"${book.title}" has been updated.`
-        })
       } catch (error) {
         console.error('Error updating book:', error)
         toast.error('Failed to update book')
@@ -417,11 +405,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'DELETE_BOOK', payload: bookId })
         toast.success('Book deleted successfully!')
-        addNotification({
-          type: 'warning',
-          title: 'Book Deleted',
-          message: `A book with ID ${bookId} has been removed from the catalog.`
-        })
       } catch (error) {
         console.error('Error deleting book:', error)
         toast.error('Failed to delete book')
@@ -460,11 +443,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         }
         dispatch({ type: 'ADD_MEMBER', payload: newMember })
         toast.success('Member added successfully!')
-        addNotification({
-          type: 'success',
-          title: 'New Member Added',
-          message: `${member.name} has been added as a new member.`
-        })
       } catch (error) {
         console.error('Error adding member:', error)
         toast.error('Failed to add member')
@@ -506,11 +484,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         
         dispatch({ type: 'UPDATE_MEMBER', payload: updatedMember })
         toast.success('Member updated successfully!')
-        addNotification({
-          type: 'info',
-          title: 'Member Updated',
-          message: `${member.name}'s details have been updated.`
-        })
       } catch (error) {
         console.error('Error updating member:', error)
         toast.error('Failed to update member')
@@ -526,11 +499,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'DELETE_MEMBER', payload: memberId })
         toast.success('Member deleted successfully!')
-        addNotification({
-          type: 'warning',
-          title: 'Member Deleted',
-          message: `A member has been removed from the system.`
-        })
       } catch (error) {
         console.error('Error deleting member:', error)
         toast.error('Failed to delete member')
@@ -548,11 +516,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'ADD_BORROWING', payload: newBorrowing })
         toast.success('Book borrowed successfully!')
-        addNotification({
-          type: 'success',
-          title: 'Book Borrowed',
-          message: `Book ID ${borrowing.bookId} borrowed by Member ID ${borrowing.memberId || borrowing.personId}.`
-        })
       } catch (error) {
         console.error('Error borrowing book:', error)
         toast.error('Failed to borrow book')
@@ -569,11 +532,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'RETURN_BOOK', payload: updatedBorrowing })
         toast.success('Book returned successfully!')
-        addNotification({
-          type: 'info',
-          title: 'Book Returned',
-          message: `Borrowing ID ${borrowingId} has been returned.`
-        })
       } catch (error) {
         console.error('Error returning book:', error)
         toast.error('Failed to return book')
@@ -591,11 +549,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'ADD_RESERVATION', payload: newReservation })
         toast.success('Book reserved successfully!')
-        addNotification({
-          type: 'info',
-          title: 'Book Reserved',
-          message: `Book ID ${reservation.bookId} reserved by Member ID ${reservation.memberId}.`
-        })
       } catch (error) {
         console.error('Error adding reservation:', error)
         toast.error('Failed to reserve book')
@@ -613,11 +566,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'ADD_ATTENDANCE', payload: newAttendance })
         toast.success('Attendance recorded successfully!')
-        addNotification({
-          type: 'info',
-          title: 'Attendance Recorded',
-          message: `Member ID ${attendance.memberId} checked in.`
-        })
       } catch (error) {
         console.error('Error adding attendance:', error)
         toast.error('Failed to record attendance')

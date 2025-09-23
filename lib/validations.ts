@@ -55,12 +55,12 @@ export const returnBookSchema = z.object({
 // Reservation validation schemas
 export const reservationSchema = z.object({
   bookId: z.string(),
-  memberId: z.string(),
+  personId: z.string(),
 })
 
 // Attendance validation schemas
 export const attendanceSchema = z.object({
-  memberId: z.string(),
+  personId: z.string(),
 })
 
 // Type exports

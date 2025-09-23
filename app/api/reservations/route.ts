@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
     }
     
     if (memberId) {
-      where.memberId = memberId
+      where.OR = [
+        { memberId: memberId },
+        { personId: memberId }
+      ]
     }
     
     if (bookId) {
@@ -36,7 +39,7 @@ export async function GET(request: NextRequest) {
         orderBy: { createdAt: 'desc' },
         include: {
           book: true,
-          member: true,
+          person: true,
         },
       }),
       prisma.reservation.count({ where }),
@@ -77,30 +80,30 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if member exists and is active
-    const member = await prisma.member.findUnique({
-      where: { id: reservationData.memberId },
+    // Check if person exists and is active
+    const person = await prisma.person.findUnique({
+      where: { id: reservationData.personId },
     })
 
-    if (!member) {
+    if (!person) {
       return NextResponse.json(
-        { error: 'Member not found' },
+        { error: 'Person not found' },
         { status: 404 }
       )
     }
 
-    if (member.status !== 'ACTIVE') {
+    if (person.status !== 'ACTIVE') {
       return NextResponse.json(
-        { error: 'Member is not active' },
+        { error: 'Person is not active' },
         { status: 400 }
       )
     }
 
-    // Check if member already has a reservation for this book
+    // Check if person already has a reservation for this book
     const existingReservation = await prisma.reservation.findFirst({
       where: {
         bookId: reservationData.bookId,
-        memberId: reservationData.memberId,
+        personId: reservationData.personId,
         status: 'WAITING',
       },
     })
@@ -112,18 +115,18 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if member already has an active borrowing for this book
+    // Check if person already has an active borrowing for this book
     const activeBorrowing = await prisma.borrowing.findFirst({
       where: {
         bookId: reservationData.bookId,
-        memberId: reservationData.memberId,
+        personId: reservationData.personId,
         status: 'BORROWED',
       },
     })
 
     if (activeBorrowing) {
       return NextResponse.json(
-        { error: 'Member already has this book borrowed' },
+        { error: 'Person already has this book borrowed' },
         { status: 409 }
       )
     }
@@ -132,11 +135,11 @@ export async function POST(request: NextRequest) {
     const reservation = await prisma.reservation.create({
       data: {
         bookId: reservationData.bookId,
-        memberId: reservationData.memberId,
+        personId: reservationData.personId,
       },
       include: {
         book: true,
-        member: true,
+        person: true,
       },
     })
 

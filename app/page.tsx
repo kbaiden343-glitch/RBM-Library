@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
@@ -21,11 +21,25 @@ import Settings from './pages/Settings'
 
 export default function Home() {
   const [activePage, setActivePage] = useState('dashboard')
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { state } = useAuth()
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setIsSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // Navigation function for search results
   const handleNavigateFromSearch = (page: string, personId?: string) => {
     setActivePage(page)
+    setIsSidebarOpen(false) // Close sidebar on mobile when navigating
     
     // Store the person ID to highlight them on the target page
     if (personId) {
@@ -42,6 +56,11 @@ export default function Home() {
         }
       }, 500)
     }
+  }
+
+  const handlePageChange = (page: string) => {
+    setActivePage(page)
+    setIsSidebarOpen(false) // Close sidebar on mobile when changing pages
   }
 
   const renderPage = () => {
@@ -76,10 +95,39 @@ export default function Home() {
       {/* <DataInitializer /> - Disabled: Manual operations only */}
       <SampleNotifications />
       <div className="min-h-screen bg-gray-50">
-        <Navbar onNavigate={handleNavigateFromSearch} />
+        <Navbar 
+          onNavigate={handleNavigateFromSearch} 
+          onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)}
+          isSidebarOpen={isSidebarOpen}
+        />
+        
+        {/* Mobile overlay */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+        
         <div className="flex">
-          <Sidebar activePage={activePage} setActivePage={setActivePage} />
-          <main className="flex-1 p-6">
+          {/* Sidebar */}
+          <div className={`
+            ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+            md:translate-x-0
+            fixed md:relative 
+            z-50 md:z-auto
+            transition-transform duration-300 ease-in-out
+            w-64
+          `}>
+            <Sidebar 
+              activePage={activePage} 
+              setActivePage={handlePageChange}
+              onClose={() => setIsSidebarOpen(false)}
+            />
+          </div>
+          
+          {/* Main content */}
+          <main className="flex-1 p-4 md:p-6 min-h-screen">
             {renderPage()}
           </main>
         </div>

@@ -19,9 +19,10 @@ import { useAuth } from '../context/AuthContext'
 interface SidebarProps {
   activePage: string
   setActivePage: (page: string) => void
+  onClose?: () => void
 }
 
-const Sidebar = ({ activePage, setActivePage }: SidebarProps) => {
+const Sidebar = ({ activePage, setActivePage, onClose }: SidebarProps) => {
   const { state, hasPermission } = useAuth()
 
   const menuItems = [
@@ -43,9 +44,16 @@ const Sidebar = ({ activePage, setActivePage }: SidebarProps) => {
   const filteredMenuItems = menuItems.filter(item => hasPermission(item.permission))
   const filteredQuickActions = quickActions.filter(action => hasPermission(action.permission))
 
+  const handleMenuClick = (page: string) => {
+    setActivePage(page)
+    if (onClose) {
+      onClose()
+    }
+  }
+
   return (
     <aside className="w-64 bg-white shadow-sm border-r border-gray-200 min-h-screen">
-      <div className="p-6">
+      <div className="p-4 md:p-6">
         <nav className="space-y-2">
           {filteredMenuItems.map((item) => {
             const Icon = item.icon
@@ -54,7 +62,7 @@ const Sidebar = ({ activePage, setActivePage }: SidebarProps) => {
             return (
               <button
                 key={item.key}
-                onClick={() => setActivePage(item.key)}
+                onClick={() => handleMenuClick(item.key)}
                 className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors w-full text-left ${
                   isActive
                     ? 'bg-blue-600 text-white'

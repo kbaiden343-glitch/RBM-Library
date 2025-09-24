@@ -31,3 +31,96 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Form Input Styles - Ensure text is always visible */
+@layer components {
+  /* Base input styles */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  input[type="search"],
+  textarea,
+  select {
+    @apply text-gray-900 bg-white border-gray-300;
+    color: #111827 !important; /* Force dark text color */
+    background-color: #ffffff !important; /* Force white background */
+  }
+
+  /* Input focus states */
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  input[type="date"]:focus,
+  input[type="search"]:focus,
+  textarea:focus,
+  select:focus {
+    @apply text-gray-900 bg-white border-blue-600 ring-2 ring-blue-600;
+    color: #111827 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* Input placeholder styles */
+  input::placeholder,
+  textarea::placeholder {
+    @apply text-gray-500;
+    color: #6b7280 !important;
+  }
+
+  /* Dark mode overrides - ensure inputs stay light */
+  @media (prefers-color-scheme: dark) {
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    input[type="url"],
+    input[type="date"],
+    input[type="search"],
+    textarea,
+    select {
+      @apply text-gray-900 bg-white border-gray-300;
+      color: #111827 !important;
+      background-color: #ffffff !important;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="number"]:focus,
+    input[type="tel"]:focus,
+    input[type="url"]:focus,
+    input[type="date"]:focus,
+    input[type="search"]:focus,
+    textarea:focus,
+    select:focus {
+      @apply text-gray-900 bg-white border-blue-600 ring-2 ring-blue-600;
+      color: #111827 !important;
+      background-color: #ffffff !important;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      @apply text-gray-500;
+      color: #6b7280 !important;
+    }
+  }
+
+  /* Checkbox and radio button styles */
+  input[type="checkbox"],
+  input[type="radio"] {
+    @apply text-blue-600 bg-white border-gray-300;
+  }
+
+  /* File input styles */
+  input[type="file"] {
+    @apply text-gray-900 bg-white border-gray-300;
+    color: #111827 !important;
+  }
+}

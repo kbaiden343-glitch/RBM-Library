@@ -345,37 +345,9 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }
 
-  // Load initial data with better error handling and performance
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Load essential data first (books and members)
-        await Promise.all([
-          fetchBooks(),
-          fetchMembers(),
-        ])
-        
-        // Load secondary data after essential data is loaded
-        setTimeout(async () => {
-          try {
-            await Promise.all([
-              fetchBorrowings(),
-              fetchReservations(),
-              fetchAttendance(),
-            ])
-          } catch (error) {
-            console.error('Error loading secondary data:', error)
-            // Don't show toast for secondary data loading errors
-          }
-        }, 100) // Small delay to let UI render first
-      } catch (error) {
-        console.error('Error loading initial data:', error)
-        toast.error('Error loading library data')
-      }
-    }
-
-    loadData()
-  }, [])
+  // Manual data loading - no automatic fetching
+  // Data will be fetched only when specific pages/components request it
+  // This prevents unnecessary API calls and improves performance
 
   const value = {
     state,

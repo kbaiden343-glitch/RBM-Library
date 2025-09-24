@@ -6,7 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import SampleNotifications from './components/SampleNotifications'
-import DataInitializer from './components/DataInitializer'
+// import DataInitializer from './components/DataInitializer' // Disabled - manual operations only
 import Dashboard from './pages/Dashboard'
 import BookCatalog from './pages/BookCatalog'
 import MemberManagement from './pages/MemberManagement'
@@ -73,7 +73,7 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <DataInitializer />
+      {/* <DataInitializer /> - Disabled: Manual operations only */}
       <SampleNotifications />
       <div className="min-h-screen bg-gray-50">
         <Navbar onNavigate={handleNavigateFromSearch} />

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useLibrary } from '../context/LibraryContext'
 import { useAuth } from '../context/AuthContext'
-import { BookOpen, Search, Filter, Plus, Eye, Edit, Trash2, Download, Upload, Star, Clock, Users, Grid, List, CheckSquare, RefreshCw } from 'lucide-react'
+import { BookOpen, Search, Filter, Plus, Eye, Edit, Trash2, Download, Upload, Star, Clock, Users, Grid, List, CheckSquare, RefreshCw, X } from 'lucide-react'
 import ImportExportModal from '../components/ImportExportModal'
 
 const BookCatalog = () => {
@@ -16,6 +16,7 @@ const BookCatalog = () => {
   const [sortBy, setSortBy] = useState('title')
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingBook, setEditingBook] = useState<any>(null)
+  const [viewingBook, setViewingBook] = useState<any>(null)
   const [viewMode, setViewMode] = useState('grid')
   const [selectedBooks, setSelectedBooks] = useState<string[]>([])
   const [showImportModal, setShowImportModal] = useState(false)
@@ -66,19 +67,40 @@ const BookCatalog = () => {
     setEditingBook(null)
   }
 
+  const handleViewBook = (book: any) => {
+    setViewingBook(book)
+  }
+
   const handleDeleteBook = async (bookId: string) => {
-    if (confirm('Are you sure you want to delete this book?')) {
-      await deleteBook(bookId)
+    const book = books.find(b => b.id === bookId)
+    const bookTitle = book ? book.title : 'this book'
+    
+    if (confirm(`Are you sure you want to delete "${bookTitle}"? This action cannot be undone.`)) {
+      try {
+        await deleteBook(bookId)
+        // Refresh the book list after successful deletion
+        setTimeout(() => fetchBooks(), 500)
+      } catch (error: any) {
+        console.error('Failed to delete book:', error)
+        // Error is already handled by the context with toast notification
+      }
     }
   }
 
   const handleBulkDelete = async () => {
     if (selectedBooks.length === 0) return
-    if (confirm(`Are you sure you want to delete ${selectedBooks.length} books?`)) {
-      for (const bookId of selectedBooks) {
-        await deleteBook(bookId)
+    if (confirm(`Are you sure you want to delete ${selectedBooks.length} books? This action cannot be undone.`)) {
+      try {
+        for (const bookId of selectedBooks) {
+          await deleteBook(bookId)
+        }
+        setSelectedBooks([])
+        // Refresh the book list after successful deletion
+        setTimeout(() => fetchBooks(), 500)
+      } catch (error: any) {
+        console.error('Failed to delete books:', error)
+        // Error is already handled by the context with toast notification
       }
-      setSelectedBooks([])
     }
   }
 
@@ -306,7 +328,10 @@ const BookCatalog = () => {
                   }`}>
                     {book.status.charAt(0) + book.status.slice(1).toLowerCase()}
                   </span>
-                  <button className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm">
+                  <button 
+                    onClick={() => handleViewBook(book)}
+                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 text-sm"
+                  >
                     <Eye className="h-4 w-4" />
                     <span>View</span>
                   </button>
@@ -407,14 +432,23 @@ const BookCatalog = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <button
+                            onClick={() => handleViewBook(book)}
+                            className="text-green-600 hover:text-green-900"
+                            title="View book details"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button
                             onClick={() => setEditingBook(book)}
                             className="text-blue-600 hover:text-blue-900"
+                            title="Edit book"
                           >
                             <Edit className="h-4 w-4" />
                           </button>
                           <button
                             onClick={() => handleDeleteBook(book.id)}
                             className="text-red-600 hover:text-red-900"
+                            title="Delete book"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -646,6 +680,109 @@ const BookCatalog = () => {
         onClose={() => setShowExportModal(false)}
         mode="export"
       />
+
+      {/* View Book Modal */}
+      {viewingBook && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-start mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Book Details</h2>
+              <button
+                onClick={() => setViewingBook(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Book Cover */}
+              <div className="flex justify-center">
+                {viewingBook.coverImage ? (
+                  <img
+                    src={viewingBook.coverImage}
+                    alt={viewingBook.title}
+                    className="w-48 h-64 object-cover rounded-lg shadow-md"
+                  />
+                ) : (
+                  <div className="w-48 h-64 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <BookOpen className="h-16 w-16 text-gray-400" />
+                  </div>
+                )}
+              </div>
+
+              {/* Book Information */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-900">{viewingBook.title}</h3>
+                  <p className="text-gray-600">by {viewingBook.author}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700">ISBN:</span>
+                    <span className="text-gray-900">{viewingBook.isbn}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700">Category:</span>
+                    <span className="text-gray-900 capitalize">{viewingBook.category}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700">Published Year:</span>
+                    <span className="text-gray-900">{viewingBook.publishedYear}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700">Status:</span>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      viewingBook.status === 'AVAILABLE' ? 'bg-green-100 text-green-800' :
+                      viewingBook.status === 'BORROWED' ? 'bg-yellow-100 text-yellow-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {viewingBook.status.charAt(0) + viewingBook.status.slice(1).toLowerCase()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700">Borrowed:</span>
+                    <span className="text-gray-900">{getBookBorrowCount(viewingBook.id)} times</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-medium text-gray-700">Added:</span>
+                    <span className="text-gray-900">{new Date(viewingBook.createdAt).toLocaleDateString()}</span>
+                  </div>
+                </div>
+
+                {viewingBook.description && (
+                  <div>
+                    <h4 className="font-medium text-gray-700 mb-2">Description:</h4>
+                    <p className="text-gray-900 text-sm leading-relaxed">{viewingBook.description}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-3 mt-6 pt-6 border-t border-gray-200">
+              <button
+                onClick={() => setViewingBook(null)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              >
+                Close
+              </button>
+              {hasPermission('books:update') && (
+                <button
+                  onClick={() => {
+                    setViewingBook(null)
+                    setEditingBook(viewingBook)
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Edit Book
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

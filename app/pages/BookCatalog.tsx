@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from 'react'
 import { useLibrary } from '../context/LibraryContext'
 import { useAuth } from '../context/AuthContext'
-import { BookOpen, Search, Filter, Plus, Eye, Edit, Trash2, Download, Upload, Star, Clock, Users, Grid, List, CheckSquare } from 'lucide-react'
+import { BookOpen, Search, Filter, Plus, Eye, Edit, Trash2, Download, Upload, Star, Clock, Users, Grid, List, CheckSquare, RefreshCw } from 'lucide-react'
 import ImportExportModal from '../components/ImportExportModal'
 
 const BookCatalog = () => {
-  const { state, addBook, updateBook, deleteBook } = useLibrary()
+  const { state, addBook, updateBook, deleteBook, fetchBooks } = useLibrary()
   const { hasPermission } = useAuth()
   const { books, borrowings } = state
   const [searchTerm, setSearchTerm] = useState('')
@@ -23,6 +23,11 @@ const BookCatalog = () => {
 
   const categories = ['all', 'fiction', 'non-fiction', 'science', 'history', 'biography', 'children', 'technology', 'art', 'philosophy']
   const statuses = ['all', 'AVAILABLE', 'BORROWED', 'RESERVED']
+
+  // Load books when component mounts
+  useEffect(() => {
+    fetchBooks()
+  }, [])
 
   const filteredBooks = books.filter(book => {
     const matchesSearch = book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -115,6 +120,13 @@ const BookCatalog = () => {
               <span>Add Book</span>
             </button>
           )}
+          <button 
+            onClick={fetchBooks}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <RefreshCw className="h-5 w-5" />
+            <span>Refresh</span>
+          </button>
           <button 
             onClick={() => setShowImportModal(true)}
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
@@ -624,6 +636,10 @@ const BookCatalog = () => {
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
         mode="import"
+        onImportSuccess={() => {
+          fetchBooks() // Refresh books after successful import
+          setShowImportModal(false)
+        }}
       />
       <ImportExportModal
         isOpen={showExportModal}

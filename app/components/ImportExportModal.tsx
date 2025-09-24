@@ -18,9 +18,10 @@ interface ImportExportModalProps {
   isOpen: boolean
   onClose: () => void
   mode: 'import' | 'export'
+  onImportSuccess?: () => void
 }
 
-const ImportExportModal = ({ isOpen, onClose, mode }: ImportExportModalProps) => {
+const ImportExportModal = ({ isOpen, onClose, mode, onImportSuccess }: ImportExportModalProps) => {
   const { state, addBook } = useLibrary()
   const { addNotification } = useNotifications()
   const [importData, setImportData] = useState<BookImportData[]>([])
@@ -91,6 +92,11 @@ const ImportExportModal = ({ isOpen, onClose, mode }: ImportExportModalProps) =>
         title: 'Import Successful',
         message: `Successfully imported ${importedCount} books.`
       })
+      
+      // Refresh the book list if callback provided
+      if (onImportSuccess) {
+        onImportSuccess()
+      }
     } else {
       addNotification({
         type: 'error',

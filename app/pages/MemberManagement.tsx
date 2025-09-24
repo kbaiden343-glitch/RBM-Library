@@ -22,10 +22,16 @@ const MemberManagement = () => {
   )
 
   const handleAddMember = async (memberData: any) => {
-    await addMember(memberData)
-    setShowAddModal(false)
-    // Refresh the members list to show the new member
-    setTimeout(() => fetchMembers(), 500)
+    try {
+      await addMember(memberData)
+      setShowAddModal(false)
+      // Refresh the members list to show the new member
+      setTimeout(() => fetchMembers(), 500)
+    } catch (error: any) {
+      console.error('Failed to add member:', error)
+      // Error is already handled by the context with toast notification
+      // Don't close modal on error so user can try again
+    }
   }
 
   const handleEditMember = async (memberData: any) => {
@@ -181,13 +187,13 @@ const MemberManagement = () => {
               e.preventDefault()
               const formData = new FormData(e.target as HTMLFormElement)
               handleAddMember({
-                name: formData.get('name'),
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                address: formData.get('address'),
-                personType: formData.get('personType') || 'MEMBER',
+                name: formData.get('name')?.toString() || '',
+                email: formData.get('email')?.toString() || '',
+                phone: formData.get('phone')?.toString() || '',
+                address: formData.get('address')?.toString() || '',
+                personType: (formData.get('personType') as 'MEMBER' | 'STUDENT' | 'VIP') || 'MEMBER',
                 membershipDate: new Date().toISOString(),
-                status: 'ACTIVE'
+                status: 'ACTIVE' as const
               })
             }}>
               <div className="space-y-4">

@@ -416,7 +416,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
           email: member.email,
           phone: member.phone,
           address: member.address,
-          personType: 'MEMBER',
+          personType: member.personType || 'MEMBER',
           status: 'ACTIVE',
         }
         const newPerson = await apiCall('/api/persons', {

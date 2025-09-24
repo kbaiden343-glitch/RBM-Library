@@ -49,7 +49,8 @@ const BorrowingSystem = () => {
     
     const borrowingPayload = {
       bookId: borrowingData.bookId,
-      personId: borrowingData.personId || borrowingData.memberId,
+      personId: borrowingData.personId,
+      memberId: borrowingData.memberId,
       dueDate: dueDate.toISOString()
     }
     

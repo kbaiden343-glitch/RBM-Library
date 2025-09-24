@@ -47,8 +47,13 @@ const BookCatalog = () => {
   })
 
   const handleAddBook = async (bookData: any) => {
-    await addBook(bookData)
-    setShowAddModal(false)
+    try {
+      await addBook(bookData)
+      setShowAddModal(false)
+    } catch (error: any) {
+      console.error('Failed to add book:', error)
+      // Error is already handled by the context with toast notification
+    }
   }
 
   const handleEditBook = async (bookData: any) => {
@@ -433,7 +438,7 @@ const BookCatalog = () => {
                 author: formData.get('author')?.toString() || '',
                 isbn: formData.get('isbn')?.toString() || '',
                 category: formData.get('category')?.toString() || '',
-                publishedYear: parseInt(formData.get('publishedYear')?.toString() || '') || new Date().getFullYear(),
+                publishedYear: parseInt(formData.get('publishedYear')?.toString() || '0') || new Date().getFullYear(),
                 description: formData.get('description')?.toString() || null,
                 coverImage: formData.get('coverImage')?.toString() || null
               })
@@ -473,6 +478,9 @@ const BookCatalog = () => {
                   name="publishedYear"
                   type="number"
                   placeholder="Published Year"
+                  min="1000"
+                  max={new Date().getFullYear() + 1}
+                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                 />
                 <textarea

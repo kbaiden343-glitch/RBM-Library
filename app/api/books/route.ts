@@ -38,16 +38,17 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        include: {
-          borrowings: {
-            where: { status: 'BORROWED' },
-            include: { member: true },
-          },
-          reservations: {
-            where: { status: 'WAITING' },
-            include: { member: true },
-          },
-        },
+        // Removed heavy includes for better performance
+        // include: {
+        //   borrowings: {
+        //     where: { status: 'BORROWED' },
+        //     include: { member: true },
+        //   },
+        //   reservations: {
+        //     where: { status: 'WAITING' },
+        //     include: { member: true },
+        //   },
+        // },
       }),
       prisma.book.count({ where }),
     ])
@@ -81,7 +82,20 @@ export async function POST(request: NextRequest) {
       description: body.description === '' ? null : body.description,
     }
     
-    const bookData = bookSchema.parse(transformedData)
+    // Validate the data
+    const validationResult = bookSchema.safeParse(transformedData)
+    if (!validationResult.success) {
+      console.error('Book validation error:', validationResult.error.issues)
+      return NextResponse.json(
+        { 
+          error: 'Invalid book data', 
+          details: validationResult.error.issues.map(err => `${err.path.join('.')}: ${err.message}`)
+        },
+        { status: 400 }
+      )
+    }
+    
+    const bookData = validationResult.data
 
     // Check if ISBN already exists
     const existingBook = await prisma.book.findUnique({

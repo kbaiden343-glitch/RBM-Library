@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
         include: {
           book: true,
           person: true,
+          // Removed member include for better performance - person is the primary model
         },
       }),
       prisma.borrowing.count({ where }),
@@ -88,28 +89,60 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if person exists and is active (using unified Person model)
-    const person = await prisma.person.findUnique({
-      where: { id: borrowingData.personId },
-    })
+    let person = null
+    let member = null
+    
+    if (borrowingData.personId) {
+      person = await prisma.person.findUnique({
+        where: { id: borrowingData.personId },
+      })
 
-    if (!person) {
-      return NextResponse.json(
-        { error: 'Person not found' },
-        { status: 404 }
-      )
-    }
+      if (!person) {
+        return NextResponse.json(
+          { error: 'Person not found' },
+          { status: 404 }
+        )
+      }
 
-    if (person.status !== 'ACTIVE') {
+      if (person.status !== 'ACTIVE') {
+        return NextResponse.json(
+          { error: 'Person is not active' },
+          { status: 400 }
+        )
+      }
+    } else if (borrowingData.memberId) {
+      // Legacy member support
+      member = await prisma.member.findUnique({
+        where: { id: borrowingData.memberId },
+      })
+
+      if (!member) {
+        return NextResponse.json(
+          { error: 'Member not found' },
+          { status: 404 }
+        )
+      }
+
+      if (member.status !== 'ACTIVE') {
+        return NextResponse.json(
+          { error: 'Member is not active' },
+          { status: 400 }
+        )
+      }
+    } else {
       return NextResponse.json(
-        { error: 'Person is not active' },
+        { error: 'Person ID or Member ID is required' },
         { status: 400 }
       )
     }
 
-    // Check if person has reached borrowing limit (e.g., 5 books)
+    // Check if person/member has reached borrowing limit (e.g., 5 books)
     const activeBorrowings = await prisma.borrowing.count({
       where: {
-        personId: borrowingData.personId,
+        OR: [
+          { personId: borrowingData.personId },
+          { memberId: borrowingData.memberId }
+        ],
         status: 'BORROWED',
       },
     })
@@ -126,11 +159,13 @@ export async function POST(request: NextRequest) {
       data: {
         bookId: borrowingData.bookId,
         personId: borrowingData.personId,
+        memberId: borrowingData.memberId,
         dueDate: new Date(borrowingData.dueDate),
       },
       include: {
         book: true,
         person: true,
+        // Removed member include for better performance
       },
     })
 

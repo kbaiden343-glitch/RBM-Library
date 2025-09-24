@@ -21,7 +21,10 @@ export const bookSchema = z.object({
   category: z.string().min(1, 'Category is required'),
   publishedYear: z.number().min(1000).max(new Date().getFullYear() + 1),
   description: z.string().optional().nullable(),
-  coverImage: z.string().url().optional().nullable(),
+  coverImage: z.string().optional().nullable().refine(
+    (val) => !val || val === '' || z.string().url().safeParse(val).success,
+    { message: 'Cover image must be a valid URL' }
+  ),
 })
 
 export const updateBookSchema = bookSchema.partial().extend({
@@ -44,8 +47,13 @@ export const updateMemberSchema = memberSchema.partial().extend({
 // Borrowing validation schemas
 export const borrowingSchema = z.object({
   bookId: z.string(),
-  personId: z.string(),
-  dueDate: z.string().datetime(),
+  personId: z.string().optional(),
+  memberId: z.string().optional(),
+  dueDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    message: "Invalid date format"
+  }),
+}).refine((data) => data.personId || data.memberId, {
+  message: "Either personId or memberId is required"
 })
 
 export const returnBookSchema = z.object({
@@ -55,12 +63,32 @@ export const returnBookSchema = z.object({
 // Reservation validation schemas
 export const reservationSchema = z.object({
   bookId: z.string(),
-  personId: z.string(),
+  personId: z.string().optional(),
+  memberId: z.string().optional(),
+}).refine((data) => data.personId || data.memberId, {
+  message: "Either personId or memberId is required"
 })
 
 // Attendance validation schemas
 export const attendanceSchema = z.object({
-  personId: z.string(),
+  action: z.enum(['check-in', 'check-out']),
+  personId: z.string().optional(),
+  memberId: z.string().optional(),
+  visitorName: z.string().optional(),
+  visitorEmail: z.string().optional(),
+  visitorPhone: z.string().optional(),
+}).refine((data) => {
+  // For check-in, we need either personId, memberId, or visitor info
+  if (data.action === 'check-in') {
+    return data.personId || data.memberId || (data.visitorName && data.visitorEmail)
+  }
+  // For check-out, we need personId, memberId, or visitorEmail
+  if (data.action === 'check-out') {
+    return data.personId || data.memberId || data.visitorEmail
+  }
+  return true
+}, {
+  message: "For check-in: personId, memberId, or visitorName+visitorEmail required. For check-out: personId, memberId, or visitorEmail required"
 })
 
 // Type exports

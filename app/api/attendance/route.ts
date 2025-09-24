@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         orderBy: { checkInTime: 'desc' },
         include: {
           person: true,
-          member: true,
+          // Removed member include for better performance - person is the primary model
         },
       }),
       prisma.attendance.count({ where }),
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
         where: whereClause,
         include: {
           person: true,
-          member: true,
+          // Removed member include for better performance - person is the primary model
         },
       })
 
@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
         data: { checkOutTime: new Date() },
         include: {
           person: true,
-          member: true,
+          // Removed member include for better performance - person is the primary model
         },
       })
 

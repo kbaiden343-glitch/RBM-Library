@@ -34,6 +34,9 @@ model Book {
   borrowings    Borrowing[]
   reservations  Reservation[]
 
+  @@index([status])
+  @@index([category])
+  @@index([createdAt])
   @@map("books")
 }
 
@@ -55,6 +58,9 @@ model Person {
   borrowings       Borrowing[]
   reservations     Reservation[]
 
+  @@index([status])
+  @@index([personType])
+  @@index([createdAt])
   @@map("persons")
 }
 
@@ -90,6 +96,10 @@ model Borrowing {
   member     Member?         @relation(fields: [memberId], references: [id], onDelete: Cascade)
   person     Person?         @relation(fields: [personId], references: [id], onDelete: Cascade)
 
+  @@index([status])
+  @@index([personId])
+  @@index([memberId])
+  @@index([createdAt])
   @@map("borrowings")
 }
 
@@ -106,6 +116,10 @@ model Reservation {
   member          Member?           @relation(fields: [memberId], references: [id], onDelete: Cascade)
   person          Person?           @relation(fields: [personId], references: [id], onDelete: Cascade)
 
+  @@index([status])
+  @@index([personId])
+  @@index([memberId])
+  @@index([createdAt])
   @@map("reservations")
 }
 
@@ -124,6 +138,10 @@ model Attendance {
   member       Member?   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   person       Person?   @relation(fields: [personId], references: [id], onDelete: Cascade)
 
+  @@index([personId])
+  @@index([memberId])
+  @@index([checkInTime])
+  @@index([isVisitor])
   @@map("attendance")
 }
 

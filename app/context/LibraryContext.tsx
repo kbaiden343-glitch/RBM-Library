@@ -49,7 +49,7 @@ interface Person {
 interface Borrowing {
   id: string
   bookId: string
-  personId: string
+  personId?: string
   memberId?: string // Keep for backward compatibility
   borrowDate: string
   dueDate: string
@@ -65,7 +65,7 @@ interface Borrowing {
 interface Reservation {
   id: string
   bookId: string
-  personId: string
+  personId?: string
   memberId?: string // Keep for backward compatibility
   reservationDate: string
   status: 'WAITING' | 'READY' | 'CANCELLED'
@@ -78,13 +78,16 @@ interface Reservation {
 
 interface Attendance {
   id: string
-  personId: string
+  personId?: string
   memberId?: string // Keep for backward compatibility
   checkInTime: string
   checkOutTime?: string
   createdAt?: string
   person?: Person
   member?: Member // Keep for backward compatibility
+  visitorName?: string
+  visitorEmail?: string
+  visitorPhone?: string
 }
 
 interface LibraryState {
@@ -247,6 +250,7 @@ const apiCall = async (url: string, options: RequestInit = {}) => {
 
   if (!response.ok) {
     const error = await response.json()
+    console.error('API Error:', error)
     throw new Error(error.error || 'API call failed')
   }
 
@@ -341,17 +345,29 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
     }
   }
 
-  // Load initial data
+  // Load initial data with better error handling and performance
   useEffect(() => {
     const loadData = async () => {
       try {
+        // Load essential data first (books and members)
         await Promise.all([
           fetchBooks(),
           fetchMembers(),
-          fetchBorrowings(),
-          fetchReservations(),
-          fetchAttendance(),
         ])
+        
+        // Load secondary data after essential data is loaded
+        setTimeout(async () => {
+          try {
+            await Promise.all([
+              fetchBorrowings(),
+              fetchReservations(),
+              fetchAttendance(),
+            ])
+          } catch (error) {
+            console.error('Error loading secondary data:', error)
+            // Don't show toast for secondary data loading errors
+          }
+        }, 100) // Small delay to let UI render first
       } catch (error) {
         console.error('Error loading initial data:', error)
         toast.error('Error loading library data')
@@ -368,15 +384,21 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
     addBook: async (book: Omit<Book, 'id'>) => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true })
+        console.log('Adding book with data:', book)
         const newBook = await apiCall('/api/books', {
           method: 'POST',
           body: JSON.stringify(book),
         })
         dispatch({ type: 'ADD_BOOK', payload: newBook })
         toast.success('Book added successfully!')
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error adding book:', error)
-        toast.error('Failed to add book')
+        // Only show toast for user-initiated actions, not sample data initialization
+        if (!error.message?.includes('already exists') && !error.message?.includes('already exists')) {
+          const errorMessage = error.message || 'Failed to add book'
+          toast.error(errorMessage)
+        }
+        throw error // Re-throw to let the component handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -443,9 +465,13 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         }
         dispatch({ type: 'ADD_MEMBER', payload: newMember })
         toast.success('Member added successfully!')
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error adding member:', error)
-        toast.error('Failed to add member')
+        // Only show toast for user-initiated actions, not sample data initialization
+        if (!error.message?.includes('already exists') && !error.message?.includes('already exists')) {
+          toast.error('Failed to add member')
+        }
+        throw error // Re-throw so DataInitializer can handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -516,9 +542,13 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'ADD_BORROWING', payload: newBorrowing })
         toast.success('Book borrowed successfully!')
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error borrowing book:', error)
-        toast.error('Failed to borrow book')
+        // Only show toast for user-initiated actions, not sample data initialization
+        if (!error.message?.includes('already') && !error.message?.includes('not found')) {
+          toast.error('Failed to borrow book')
+        }
+        throw error // Re-throw so DataInitializer can handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -549,9 +579,13 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         })
         dispatch({ type: 'ADD_RESERVATION', payload: newReservation })
         toast.success('Book reserved successfully!')
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error adding reservation:', error)
-        toast.error('Failed to reserve book')
+        // Only show toast for user-initiated actions, not sample data initialization
+        if (!error.message?.includes('already') && !error.message?.includes('not found')) {
+          toast.error('Failed to reserve book')
+        }
+        throw error // Re-throw so DataInitializer can handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -560,15 +594,27 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
     addAttendance: async (attendance: Omit<Attendance, 'id' | 'checkInTime'>) => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true })
+        const attendancePayload = {
+          action: 'check-in',
+          personId: attendance.personId,
+          memberId: attendance.memberId,
+          visitorName: attendance.visitorName,
+          visitorEmail: attendance.visitorEmail,
+          visitorPhone: attendance.visitorPhone
+        }
         const newAttendance = await apiCall('/api/attendance', {
           method: 'POST',
-          body: JSON.stringify(attendance),
+          body: JSON.stringify(attendancePayload),
         })
         dispatch({ type: 'ADD_ATTENDANCE', payload: newAttendance })
         toast.success('Attendance recorded successfully!')
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error adding attendance:', error)
-        toast.error('Failed to record attendance')
+        // Only show toast for user-initiated actions, not sample data initialization
+        if (!error.message?.includes('already') && !error.message?.includes('already checked in')) {
+          toast.error('Failed to record attendance')
+        }
+        throw error // Re-throw so DataInitializer can handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }

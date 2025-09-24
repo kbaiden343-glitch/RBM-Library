@@ -199,9 +199,12 @@ const Dashboard = () => {
       description: 'Log member library visit',
       icon: Calendar,
       action: () => {
-        const memberId = members[0]?.id
-        if (memberId) {
-          addAttendance({ personId: memberId })
+        const member = members[0]
+        if (member) {
+          addAttendance({ 
+            personId: member.id,
+            memberId: member.id 
+          })
         }
       },
       color: 'bg-purple-500',

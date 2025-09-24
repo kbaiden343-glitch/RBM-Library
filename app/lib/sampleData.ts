@@ -67,7 +67,7 @@ export const generateSampleBooks = () => [
     author: "Sun Tzu",
     isbn: "9781590309637",
     category: "philosophy",
-    publishedYear: -500,
+    publishedYear: 500, // Fixed: Changed from -500 to 500
     description: "An ancient Chinese military treatise",
     status: "AVAILABLE" as const
   }
@@ -129,7 +129,7 @@ export const generateSampleBorrowings = (bookIds: string[], memberIds: string[])
     borrowDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     returnDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
     dueDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "returned" as const
+    status: "RETURNED" as const
   }
 ]
 
@@ -154,6 +154,6 @@ export const generateSampleReservations = (bookIds: string[], memberIds: string[
     bookId: bookIds[4], // Sapiens
     personId: memberIds[2], // Mike Johnson
     reservationDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    status: "waiting" as const
+    status: "WAITING" as const
   }
 ]

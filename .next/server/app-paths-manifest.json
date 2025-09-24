@@ -1,10 +1,10 @@
 {
   "/page": "app/page.js",
   "/api/books/route": "app/api/books/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
   "/api/persons/route": "app/api/persons/route.js",
-  "/api/borrowings/route": "app/api/borrowings/route.js",
   "/api/attendance/route": "app/api/attendance/route.js",
+  "/api/borrowings/route": "app/api/borrowings/route.js",
   "/api/reservations/route": "app/api/reservations/route.js",
-  "/api/auth/login/route": "app/api/auth/login/route.js"
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js"
 }

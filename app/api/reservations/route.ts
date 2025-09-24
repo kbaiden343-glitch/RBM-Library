@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
         include: {
           book: true,
           person: true,
+          // Removed member include for better performance
         },
       }),
       prisma.reservation.count({ where }),
@@ -81,29 +82,60 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if person exists and is active
-    const person = await prisma.person.findUnique({
-      where: { id: reservationData.personId },
-    })
+    let person = null
+    
+    if (reservationData.personId) {
+      person = await prisma.person.findUnique({
+        where: { id: reservationData.personId },
+      })
 
-    if (!person) {
-      return NextResponse.json(
-        { error: 'Person not found' },
-        { status: 404 }
-      )
-    }
+      if (!person) {
+        return NextResponse.json(
+          { error: 'Person not found' },
+          { status: 404 }
+        )
+      }
 
-    if (person.status !== 'ACTIVE') {
+      if (person.status !== 'ACTIVE') {
+        return NextResponse.json(
+          { error: 'Person is not active' },
+          { status: 400 }
+        )
+      }
+    } else if (reservationData.memberId) {
+      // Legacy member support
+      const member = await prisma.member.findUnique({
+        where: { id: reservationData.memberId },
+      })
+
+      if (!member) {
+        return NextResponse.json(
+          { error: 'Member not found' },
+          { status: 404 }
+        )
+      }
+
+      if (member.status !== 'ACTIVE') {
+        return NextResponse.json(
+          { error: 'Member is not active' },
+          { status: 400 }
+        )
+      }
+    } else {
       return NextResponse.json(
-        { error: 'Person is not active' },
+        { error: 'Person ID or Member ID is required' },
         { status: 400 }
       )
     }
 
-    // Check if person already has a reservation for this book
+    // Check if person/member already has a reservation for this book
     const existingReservation = await prisma.reservation.findFirst({
       where: {
         bookId: reservationData.bookId,
-        personId: reservationData.personId,
+        OR: [
+          { personId: reservationData.personId },
+          { memberId: reservationData.memberId }
+        ],
         status: 'WAITING',
       },
     })
@@ -115,11 +147,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if person already has an active borrowing for this book
+    // Check if person/member already has an active borrowing for this book
     const activeBorrowing = await prisma.borrowing.findFirst({
       where: {
         bookId: reservationData.bookId,
-        personId: reservationData.personId,
+        OR: [
+          { personId: reservationData.personId },
+          { memberId: reservationData.memberId }
+        ],
         status: 'BORROWED',
       },
     })
@@ -136,10 +171,12 @@ export async function POST(request: NextRequest) {
       data: {
         bookId: reservationData.bookId,
         personId: reservationData.personId,
+        memberId: reservationData.memberId,
       },
       include: {
         book: true,
         person: true,
+        // Removed member include for better performance
       },
     })
 

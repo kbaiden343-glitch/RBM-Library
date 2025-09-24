@@ -471,7 +471,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         if (!error.message?.includes('already exists') && !error.message?.includes('already exists')) {
           toast.error('Failed to add member')
         }
-        throw error // Re-throw so DataInitializer can handle it
+        throw error // Re-throw to let the component handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -548,7 +548,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         if (!error.message?.includes('already') && !error.message?.includes('not found')) {
           toast.error('Failed to borrow book')
         }
-        throw error // Re-throw so DataInitializer can handle it
+        throw error // Re-throw to let the component handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -585,7 +585,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         if (!error.message?.includes('already') && !error.message?.includes('not found')) {
           toast.error('Failed to reserve book')
         }
-        throw error // Re-throw so DataInitializer can handle it
+        throw error // Re-throw to let the component handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }
@@ -614,7 +614,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         if (!error.message?.includes('already') && !error.message?.includes('already checked in')) {
           toast.error('Failed to record attendance')
         }
-        throw error // Re-throw so DataInitializer can handle it
+        throw error // Re-throw to let the component handle it
       } finally {
         dispatch({ type: 'SET_LOADING', payload: false })
       }

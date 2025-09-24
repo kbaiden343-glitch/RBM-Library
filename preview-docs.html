@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; margin-top: 30px; }
+        h3 { color: #2c3e50; margin-top: 25px; }
+        h4 { color: #7f8c8d; margin-top: 20px; }
+        code {
+            background-color: #f1f2f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        .toc {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 30px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 8px 0;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        .highlight {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .endpoint {
+            background-color: #e8f5e8;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Library Management System Documentation</h1>
+        
+        <div class="highlight">
+            <strong>Quick Start:</strong> This documentation covers the complete Library Management System. Use the table of contents below to navigate to specific sections.
+        </div>
+
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">1. System Overview</a></li>
+                <li><a href="#tech-stack">2. Technology Stack</a></li>
+                <li><a href="#architecture">3. System Architecture</a></li>
+                <li><a href="#database">4. Database Schema</a></li>
+                <li><a href="#api">5. API Documentation</a></li>
+                <li><a href="#frontend">6. Frontend Components</a></li>
+                <li><a href="#roles">7. User Roles & Permissions</a></li>
+                <li><a href="#features">8. Features Overview</a></li>
+                <li><a href="#installation">9. Installation & Setup</a></li>
+                <li><a href="#deployment">10. Deployment</a></li>
+                <li><a href="#security">11. Security Features</a></li>
+                <li><a href="#performance">12. Performance Optimizations</a></li>
+                <li><a href="#troubleshooting">13. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">🎯 System Overview</h2>
+        <p>The Library Management System is a comprehensive web application designed to manage all aspects of a modern library operation. It provides functionality for:</p>
+        <ul>
+            <li><strong>Book Management:</strong> Complete catalog system with search, categorization, and inventory tracking</li>
+            <li><strong>Member Management:</strong> User registration, profile management, and membership tracking</li>
+            <li><strong>Borrowing System:</strong> Book lending, returns, reservations, and overdue management</li>
+            <li><strong>Attendance Tracking:</strong> Library visitor and member attendance monitoring</li>
+            <li><strong>Administrative Tools:</strong> User management, settings, reports, and system configuration</li>
+            <li><strong>Import/Export:</strong> Bulk data operations for books and member information</li>
+        </ul>
+
+        <h2 id="tech-stack">⚙️ Technology Stack</h2>
+        <h3>Frontend</h3>
+        <ul>
+            <li><strong>Framework:</strong> Next.js 14.2.32 (React-based)</li>
+            <li><strong>Styling:</strong> Tailwind CSS</li>
+            <li><strong>Icons:</strong> Lucide React</li>
+            <li><strong>Notifications:</strong> React Hot Toast</li>
+            <li><strong>State Management:</strong> React Context API</li>
+        </ul>
+
+        <h3>Backend</h3>
+        <ul>
+            <li><strong>Runtime:</strong> Node.js</li>
+            <li><strong>Framework:</strong> Next.js API Routes</li>
+            <li><strong>Database:</strong> PostgreSQL</li>
+            <li><strong>ORM:</strong> Prisma</li>
+            <li><strong>Authentication:</strong> bcryptjs for password hashing</li>
+        </ul>
+
+        <h2 id="architecture">🏗️ System Architecture</h2>
+        <div class="highlight">
+            <strong>Architecture Pattern:</strong> The system follows a modern three-tier architecture with React frontend, Next.js API layer, and PostgreSQL database.
+        </div>
+
+        <h3>Component Structure</h3>
+        <pre><code>app/
+├── api/                    # API routes
+│   ├── auth/              # Authentication endpoints
+│   ├── books/             # Book management
+│   ├── members/           # Member management
+│   ├── persons/           # Person management (unified)
+│   ├── borrowings/        # Borrowing system
+│   ├── reservations/      # Reservation system
+│   ├── attendance/        # Attendance tracking
+│   └── dashboard/         # Dashboard statistics
+├── components/            # Reusable UI components
+├── context/               # React Context providers
+├── lib/                   # Utility functions
+├── pages/                 # Main application pages
+└── globals.css           # Global styles</code></pre>
+
+        <h2 id="database">🗄️ Database Schema</h2>
+        <p>The system uses a well-structured PostgreSQL database with the following core entities:</p>
+        
+        <h3>Core Tables</h3>
+        <table>
+            <tr>
+                <th>Table</th>
+                <th>Purpose</th>
+                <th>Key Fields</th>
+            </tr>
+            <tr>
+                <td>Users</td>
+                <td>System users and authentication</td>
+                <td>id, name, email, password, role</td>
+            </tr>
+            <tr>
+                <td>Books</td>
+                <td>Book catalog and inventory</td>
+                <td>id, title, author, isbn, category, status</td>
+            </tr>
+            <tr>
+                <td>Persons</td>
+                <td>Unified member and visitor management</td>
+                <td>id, name, email, personType, status</td>
+            </tr>
+            <tr>
+                <td>Borrowings</td>
+                <td>Book lending transactions</td>
+                <td>id, bookId, personId, borrowDate, dueDate, status</td>
+            </tr>
+            <tr>
+                <td>Reservations</td>
+                <td>Book reservation system</td>
+                <td>id, bookId, personId, reservationDate, status</td>
+            </tr>
+            <tr>
+                <td>Attendance</td>
+                <td>Library attendance tracking</td>
+                <td>id, personId, checkInTime, checkOutTime, purpose</td>
+            </tr>
+        </table>
+
+        <h2 id="api">🔌 API Documentation</h2>
+        <p>The system provides a comprehensive REST API for all operations:</p>
+
+        <h3>Authentication Endpoints</h3>
+        <div class="endpoint">POST /api/auth/login</div>
+        <div class="endpoint">POST /api/auth/register</div>
+
+        <h3>Book Management</h3>
+        <div class="endpoint">GET /api/books</div>
+        <div class="endpoint">POST /api/books</div>
+        <div class="endpoint">PUT /api/books/[id]</div>
+        <div class="endpoint">DELETE /api/books/[id]</div>
+
+        <h3>Member Management</h3>
+        <div class="endpoint">GET /api/persons</div>
+        <div class="endpoint">POST /api/persons</div>
+        <div class="endpoint">PUT /api/persons/[id]</div>
+
+        <h3>Borrowing System</h3>
+        <div class="endpoint">GET /api/borrowings</div>
+        <div class="endpoint">POST /api/borrowings</div>
+        <div class="endpoint">PUT /api/borrowings/[id]</div>
+
+        <h2 id="roles">👥 User Roles & Permissions</h2>
+        <table>
+            <tr>
+                <th>Role</th>
+                <th>Permissions</th>
+                <th>Access Level</th>
+            </tr>
+            <tr>
+                <td><strong>Admin</strong></td>
+                <td>Full system access, user management, system settings</td>
+                <td>Complete</td>
+            </tr>
+            <tr>
+                <td><strong>Librarian</strong></td>
+                <td>Book management, member operations, borrowing system</td>
+                <td>Operational</td>
+            </tr>
+            <tr>
+                <td><strong>Member</strong></td>
+                <td>View books, personal borrowing history, reservations</td>
+                <td>Limited</td>
+            </tr>
+        </table>
+
+        <h2 id="features">✨ Features Overview</h2>
+        <h3>Book Management</h3>
+        <ul>
+            <li>Complete catalog system with search and filtering</li>
+            <li>ISBN management and unique identifier tracking</li>
+            <li>Cover image support and status tracking</li>
+            <li>Bulk import/export operations</li>
+        </ul>
+
+        <h3>Member Management</h3>
+        <ul>
+            <li>Unified system for members and visitors</li>
+            <li>Contact information and membership tracking</li>
+            <li>Multiple membership types (Regular, Student, VIP)</li>
+            <li>Emergency contact information</li>
+        </ul>
+
+        <h3>Borrowing System</h3>
+        <ul>
+            <li>Complete borrowing lifecycle management</li>
+            <li>Automatic due date calculation</li>
+            <li>Overdue book identification and handling</li>
+            <li>Complete borrowing history tracking</li>
+        </ul>
+
+        <h2 id="installation">🚀 Installation & Setup</h2>
+        <h3>Prerequisites</h3>
+        <ul>
+            <li>Node.js 18+</li>
+            <li>PostgreSQL 14+</li>
+            <li>Git</li>
+        </ul>
+
+        <h3>Quick Setup</h3>
+        <pre><code># Clone repository
+git clone &lt;repository-url&gt;
+cd library-project
+
+# Install dependencies
+npm install
+
+# Setup environment
+cp .env.example .env.local
+# Edit .env.local with your database URL
+
+# Setup database
+npx prisma generate
+npx prisma db push
+node scripts/migrate-data.js
+
+# Start development server
+npm run dev</code></pre>
+
+        <h3>Default Login Credentials</h3>
+        <ul>
+            <li><strong>Admin:</strong> admin / password</li>
+            <li><strong>Librarian:</strong> librarian / password</li>
+            <li><strong>Member:</strong> member / password</li>
+        </ul>
+
+        <h2 id="security">🔒 Security Features</h2>
+        <ul>
+            <li><strong>Password Hashing:</strong> bcryptjs with salt rounds</li>
+            <li><strong>Session Management:</strong> Secure session handling</li>
+            <li><strong>Role-Based Access:</strong> Granular permission system</li>
+            <li><strong>Input Validation:</strong> Type-safe validation with Zod</li>
+            <li><strong>SQL Injection Protection:</strong> Prisma ORM protection</li>
+        </ul>
+
+        <h2 id="performance">⚡ Performance Optimizations</h2>
+        <ul>
+            <li><strong>Database Indexing:</strong> Strategic indexes for common queries</li>
+            <li><strong>Connection Pooling:</strong> Efficient database connections</li>
+            <li><strong>Code Splitting:</strong> Dynamic imports for better loading</li>
+            <li><strong>Image Optimization:</strong> Next.js automatic optimization</li>
+            <li><strong>API Pagination:</strong> Efficient large dataset handling</li>
+        </ul>
+
+        <h2 id="troubleshooting">🔧 Troubleshooting</h2>
+        <h3>Common Issues</h3>
+        <ul>
+            <li><strong>Database Connection:</strong> Check DATABASE_URL in .env.local</li>
+            <li><strong>Build Errors:</strong> Clear .next cache and rebuild</li>
+            <li><strong>Permission Errors:</strong> Verify user roles and permissions</li>
+            <li><strong>Import Issues:</strong> Check file format and validation</li>
+        </ul>
+
+        <div class="highlight">
+            <strong>Support:</strong> For additional help, refer to the project repository or contact the development team.
+        </div>
+
+        <hr>
+        <p style="text-align: center; color: #7f8c8d; margin-top: 40px;">
+            <strong>Library Management System v1.0.0</strong><br>
+            Last Updated: January 2024
+        </p>
+    </div>
+</body>
+</html>

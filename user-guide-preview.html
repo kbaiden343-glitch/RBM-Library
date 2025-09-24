@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robert Aboagye Mensah Community Library - User Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 10px;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; border-bottom: 2px solid #ecf0f1; padding-bottom: 8px; margin-top: 30px; }
+        h3 { color: #2c3e50; margin-top: 25px; }
+        h4 { color: #7f8c8d; margin-top: 20px; }
+        .toc {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .toc h2 {
+            color: white;
+            border: none;
+            margin-top: 0;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 10px 0;
+            padding: 5px 0;
+        }
+        .toc a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+            transform: translateX(5px);
+        }
+        .highlight {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-left: 5px solid #ff6b6b;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .login-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #4ecdc4;
+        }
+        .checklist {
+            background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .checklist h4 {
+            color: #8e44ad;
+            margin-top: 0;
+        }
+        .checklist ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .checklist li {
+            margin: 8px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 5px;
+            border-left: 4px solid #9b59b6;
+        }
+        .checklist li:before {
+            content: "☐ ";
+            font-weight: bold;
+            color: #9b59b6;
+        }
+        .steps {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .steps h4 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        .steps ol {
+            padding-left: 20px;
+        }
+        .steps li {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        .contact-box {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+            color: white;
+        }
+        .contact-box h2 {
+            color: white;
+            border: none;
+            margin-top: 0;
+        }
+        code {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+        .footer h3 {
+            color: white;
+            margin-top: 0;
+        }
+        .quick-ref {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #ff6b6b;
+        }
+        .quick-ref h4 {
+            color: #e74c3c;
+            margin-top: 0;
+        }
+        .login-credentials {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .login-credentials table {
+            background: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Robert Aboagye Mensah Community Library</h1>
+            <p>Digital Library Management System - User Guide</p>
+        </div>
+
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
+            <ul>
+                <li><a href="#getting-started">1. Getting Started</a></li>
+                <li><a href="#login">2. Login & Access</a></li>
+                <li><a href="#dashboard">3. Dashboard Overview</a></li>
+                <li><a href="#librarians">4. For Librarians</a></li>
+                <li><a href="#members">5. For Members</a></li>
+                <li><a href="#books">6. Book Management</a></li>
+                <li><a href="#members">7. Member Management</a></li>
+                <li><a href="#borrowing">8. Borrowing System</a></li>
+                <li><a href="#attendance">9. Attendance Tracking</a></li>
+                <li><a href="#reports">10. Reports & Statistics</a></li>
+                <li><a href="#troubleshooting">11. Troubleshooting</a></li>
+                <li><a href="#support">12. Contact & Support</a></li>
+            </ul>
+        </div>
+
+        <h2 id="getting-started">🚀 Getting Started</h2>
+        
+        <div class="highlight">
+            <strong>Welcome!</strong> This guide will help you navigate and use all the features of the Robert Aboagye Mensah Community Library's digital management system.
+        </div>
+
+        <h3>System Requirements</h3>
+        <ul>
+            <li><strong>Web Browser:</strong> Chrome, Firefox, Safari, or Edge (latest versions)</li>
+            <li><strong>Internet Connection:</strong> Required for accessing the system</li>
+            <li><strong>Device:</strong> Computer, tablet, or smartphone</li>
+        </ul>
+
+        <h2 id="login">🔐 Login & Access</h2>
+        
+        <div class="login-credentials">
+            <h3>Default Login Credentials</h3>
+            <table>
+                <tr>
+                    <th>User Type</th>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Access Level</th>
+                </tr>
+                <tr>
+                    <td><strong>Admin</strong></td>
+                    <td><code>admin</code></td>
+                    <td><code>password</code></td>
+                    <td>Full Access</td>
+                </tr>
+                <tr>
+                    <td><strong>Librarian</strong></td>
+                    <td><code>librarian</code></td>
+                    <td><code>password</code></td>
+                    <td>Operational</td>
+                </tr>
+                <tr>
+                    <td><strong>Member</strong></td>
+                    <td><code>member</code></td>
+                    <td><code>password</code></td>
+                    <td>Limited</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="steps">
+            <h4>Login Process</h4>
+            <ol>
+                <li>Enter your username in the "Username" field</li>
+                <li>Enter your password in the "Password" field</li>
+                <li>Click "Sign In"</li>
+                <li>You'll be redirected to the main dashboard</li>
+            </ol>
+        </div>
+
+        <h2 id="dashboard">📊 Dashboard Overview</h2>
+        
+        <p>The dashboard is your central hub for all library operations. It provides:</p>
+        
+        <div class="quick-ref">
+            <h4>Key Information Display</h4>
+            <ul>
+                <li><strong>Total Books:</strong> Number of books in the catalog</li>
+                <li><strong>Active Members:</strong> Current library members</li>
+                <li><strong>Active Borrowings:</strong> Books currently on loan</li>
+                <li><strong>Overdue Books:</strong> Books that need to be returned</li>
+                <li><strong>Today's Attendance:</strong> Number of visitors today</li>
+            </ul>
+        </div>
+
+        <h2 id="librarians">👩‍💼 For Librarians</h2>
+        
+        <div class="checklist">
+            <h4>Daily Operations Checklist</h4>
+            <h5>Morning Routine (9:00 AM)</h5>
+            <ul>
+                <li>Check Dashboard: Review overnight activities and notifications</li>
+                <li>Process Returns: Handle books returned by members</li>
+                <li>Update Attendance: Record member arrivals</li>
+                <li>Check Overdue Books: Review and follow up on overdue items</li>
+            </ul>
+            
+            <h5>Throughout the Day</h5>
+            <ul>
+                <li>Help Members: Assist with book searches and borrowing</li>
+                <li>Register New Members: Add new library members to the system</li>
+                <li>Process Borrowing Requests: Handle book lending</li>
+                <li>Manage Reservations: Process book reservation requests</li>
+                <li>Update Book Catalog: Add new books or update existing ones</li>
+            </ul>
+            
+            <h5>End of Day (5:00 PM)</h5>
+            <ul>
+                <li>Review Statistics: Check daily attendance and borrowing statistics</li>
+                <li>Generate Reports: Create reports for management if needed</li>
+                <li>Clean Up: Ensure all transactions are properly recorded</li>
+            </ul>
+        </div>
+
+        <h2 id="books">📚 Book Management</h2>
+        
+        <div class="steps">
+            <h4>Adding New Books</h4>
+            <ol>
+                <li>Navigate to Book Catalog: Click "Book Catalog" in the main menu</li>
+                <li>Click "Add Book": Use the green "Add Book" button</li>
+                <li>Fill in Details:
+                    <ul>
+                        <li><strong>Title:</strong> Complete book title</li>
+                        <li><strong>Author:</strong> Author's full name</li>
+                        <li><strong>ISBN:</strong> 13-digit ISBN number</li>
+                        <li><strong>Category:</strong> Select from dropdown</li>
+                        <li><strong>Published Year:</strong> Year of publication</li>
+                        <li><strong>Description:</strong> Brief book description (optional)</li>
+                    </ul>
+                </li>
+                <li>Save: Click "Add Book" to save</li>
+            </ol>
+        </div>
+
+        <h2 id="borrowing">📖 Borrowing System</h2>
+        
+        <div class="steps">
+            <h4>Lending Books to Members</h4>
+            <ol>
+                <li>Find the Book: Search for the book in the catalog</li>
+                <li>Check Availability: Ensure book status is "Available"</li>
+                <li>Find Member: Locate the member in the system</li>
+                <li>Create Borrowing Record:
+                    <ul>
+                        <li>Select the book</li>
+                        <li>Select the member</li>
+                        <li>Set due date (usually 2 weeks from today)</li>
+                        <li>Add any notes if needed</li>
+                    </ul>
+                </li>
+                <li>Confirm: Complete the borrowing transaction</li>
+            </ol>
+        </div>
+
+        <div class="quick-ref">
+            <h4>Borrowing Rules</h4>
+            <ul>
+                <li><strong>Borrowing Period:</strong> 14 days (2 weeks)</li>
+                <li><strong>Maximum Books:</strong> 5 books per member</li>
+                <li><strong>Renewal:</strong> Books can be renewed once for an additional 14 days</li>
+                <li><strong>Overdue Fines:</strong> $0.50 per day for overdue books</li>
+            </ul>
+        </div>
+
+        <h2 id="attendance">👥 Attendance Tracking</h2>
+        
+        <div class="steps">
+            <h4>Recording Member Attendance</h4>
+            <ol>
+                <li>Navigate to Attendance: Go to "Attendance Tracking"</li>
+                <li>Find Member: Search for the member</li>
+                <li>Record Check-in: Log arrival time</li>
+                <li>Add Purpose: Note reason for visit (Study, Research, etc.)</li>
+            </ol>
+        </div>
+
+        <h2 id="troubleshooting">🔧 Troubleshooting</h2>
+        
+        <div class="highlight">
+            <h4>Common Issues and Solutions</h4>
+            
+            <h5>Login Problems</h5>
+            <p><strong>Issue:</strong> Cannot log in to the system</p>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li>Check username and password spelling</li>
+                <li>Ensure Caps Lock is off</li>
+                <li>Clear browser cache and cookies</li>
+                <li>Contact administrator for password reset</li>
+            </ul>
+            
+            <h5>Book Search Issues</h5>
+            <p><strong>Issue:</strong> Cannot find a specific book</p>
+            <p><strong>Solutions:</strong></p>
+            <ul>
+                <li>Try different search terms</li>
+                <li>Check spelling of title or author</li>
+                <li>Use broader search terms</li>
+                <li>Check if book is in the system</li>
+            </ul>
+        </div>
+
+        <h2 id="support">📞 Contact & Support</h2>
+        
+        <div class="contact-box">
+            <h2>Getting Help</h2>
+            <p><strong>Technical Support:</strong> Contact your IT administrator for technical issues</p>
+            <p><strong>Library Director:</strong> For policy and operational questions</p>
+            <p><strong>Staff Training:</strong> Request additional training sessions</p>
+        </div>
+
+        <div class="footer">
+            <h3>Robert Aboagye Mensah Community Library</h3>
+            <p><em>Empowering our community through knowledge and learning</em></p>
+            <p><strong>System Version:</strong> 1.0.0 | <strong>Last Updated:</strong> January 2024</p>
+        </div>
+    </div>
+</body>
+</html>

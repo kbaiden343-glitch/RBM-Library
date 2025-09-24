@@ -35,8 +35,16 @@ const MemberManagement = () => {
   }
 
   const handleEditMember = async (memberData: any) => {
-    await updateMember(memberData)
-    setEditingMember(null)
+    try {
+      await updateMember(memberData)
+      setEditingMember(null)
+      // Refresh the members list to show the updated member
+      setTimeout(() => fetchMembers(), 500)
+    } catch (error: any) {
+      console.error('Failed to update member:', error)
+      // Error is already handled by the context with toast notification
+      // Don't close modal on error so user can try again
+    }
   }
 
   const handleDeleteMember = async (memberId: string) => {
@@ -244,6 +252,106 @@ const MemberManagement = () => {
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   Add Member
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Member Modal */}
+      {editingMember && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4">Edit Member</h2>
+            <form onSubmit={(e) => {
+              e.preventDefault()
+              const formData = new FormData(e.target as HTMLFormElement)
+              handleEditMember({
+                id: editingMember.id,
+                name: formData.get('name')?.toString() || '',
+                email: formData.get('email')?.toString() || '',
+                phone: formData.get('phone')?.toString() || '',
+                address: formData.get('address')?.toString() || '',
+                personType: (formData.get('personType') as 'MEMBER' | 'STUDENT' | 'VIP') || 'MEMBER',
+                status: (formData.get('status') as 'ACTIVE' | 'INACTIVE') || 'ACTIVE',
+                notes: formData.get('notes')?.toString() || '',
+                emergencyContact: formData.get('emergencyContact')?.toString() || ''
+              })
+            }}>
+              <div className="space-y-4">
+                <input
+                  name="name"
+                  placeholder="Full Name"
+                  defaultValue={editingMember.name}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                />
+                <input
+                  name="email"
+                  type="email"
+                  placeholder="Email Address"
+                  defaultValue={editingMember.email}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                />
+                <input
+                  name="phone"
+                  placeholder="Phone Number"
+                  defaultValue={editingMember.phone || ''}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                />
+                <textarea
+                  name="address"
+                  placeholder="Address"
+                  rows={3}
+                  defaultValue={editingMember.address || ''}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                />
+                <select
+                  name="personType"
+                  defaultValue={editingMember.personType || 'MEMBER'}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                >
+                  <option value="MEMBER">Regular Member</option>
+                  <option value="STUDENT">Student Member</option>
+                  <option value="VIP">VIP Member</option>
+                </select>
+                <select
+                  name="status"
+                  defaultValue={editingMember.status || 'ACTIVE'}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
+                <input
+                  name="emergencyContact"
+                  placeholder="Emergency Contact (optional)"
+                  defaultValue={editingMember.emergencyContact || ''}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                />
+                <textarea
+                  name="notes"
+                  placeholder="Notes (optional)"
+                  rows={2}
+                  defaultValue={editingMember.notes || ''}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                />
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  type="button"
+                  onClick={() => setEditingMember(null)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Update Member
                 </button>
               </div>
             </form>

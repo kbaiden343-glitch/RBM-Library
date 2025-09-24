@@ -10,7 +10,7 @@ async function fixAdminPassword() {
     const correctHash = '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W'
     
     const updatedUser = await prisma.user.update({
-      where: { email: 'admin@library.com' },
+      where: { email: 'admin' },
       data: { password: correctHash }
     })
     
@@ -19,7 +19,7 @@ async function fixAdminPassword() {
     console.log('Role:', updatedUser.role)
     
     // Test the password
-    const isValid = bcrypt.compareSync('admin123', correctHash)
+    const isValid = bcrypt.compareSync('password', correctHash)
     console.log('Password verification:', isValid ? '✅ Valid' : '❌ Invalid')
     
   } catch (error) {

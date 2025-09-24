@@ -95,9 +95,9 @@ The application will be available at http://localhost:3000
 
 ## Default Login Credentials
 
-- **Admin**: admin@library.com / admin123
-- **Librarian**: librarian@library.com / librarian123
-- **Member**: member@library.com / member123
+- **Admin**: admin / password
+- **Librarian**: librarian / password
+- **Member**: member / password
 
 ## Database Management
 

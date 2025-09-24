@@ -72,15 +72,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if person already exists (in persons table or legacy members table)
-    const [existingPerson, existingMember] = await Promise.all([
-      prisma.person.findUnique({
-        where: { email },
-      }),
-      prisma.member.findUnique({
-        where: { email },
-      }).catch(() => null) // Handle case where members table doesn't exist
-    ])
+    // Check if person already exists (optimized to use single connection)
+    const existingPerson = await prisma.person.findUnique({
+      where: { email },
+    })
 
     if (existingPerson) {
       return NextResponse.json(
@@ -90,6 +85,17 @@ export async function POST(request: NextRequest) {
         },
         { status: 409 }
       )
+    }
+
+    // Only check legacy members table if person doesn't exist
+    let existingMember = null
+    try {
+      existingMember = await prisma.member.findUnique({
+        where: { email },
+      })
+    } catch (error) {
+      // Handle case where members table doesn't exist
+      console.log('Legacy members table check skipped:', error)
     }
 
     if (existingMember) {
@@ -133,6 +139,18 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { error: 'A person with this email already exists' },
           { status: 409 }
+        )
+      }
+      
+      // Handle connection pool exhaustion
+      if (error.message.includes('Max client connections reached') || 
+          error.message.includes('connection pool')) {
+        return NextResponse.json(
+          { 
+            error: 'Database temporarily unavailable. Please try again in a moment.',
+            details: 'Connection pool limit reached'
+          },
+          { status: 503 }
         )
       }
     }

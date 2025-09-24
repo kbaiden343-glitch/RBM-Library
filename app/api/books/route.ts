@@ -32,26 +32,16 @@ export async function GET(request: NextRequest) {
       where.status = status
     }
 
-    const [books, total] = await Promise.all([
-      prisma.book.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        // Removed heavy includes for better performance
-        // include: {
-        //   borrowings: {
-        //     where: { status: 'BORROWED' },
-        //     include: { member: true },
-        //   },
-        //   reservations: {
-        //     where: { status: 'WAITING' },
-        //     include: { member: true },
-        //   },
-        // },
-      }),
-      prisma.book.count({ where }),
-    ])
+    // Optimized to use single connection for better performance
+    const books = await prisma.book.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      // Removed heavy includes for better performance
+    })
+    
+    const total = await prisma.book.count({ where })
 
     return NextResponse.json({
       books,

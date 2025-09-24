@@ -57,12 +57,12 @@ const MemberManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Member Management</h1>
-          <p className="text-gray-600 mt-2">Manage library members and their information</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Member Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1 sm:mt-2">Manage library members and their information</p>
         </div>
-        <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
           {/* View Mode Toggle */}
           <div className="flex items-center bg-gray-100 rounded-lg p-1">
             <button
@@ -89,23 +89,23 @@ const MemberManagement = () => {
           
           <button
             onClick={fetchMembers}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center space-x-2"
+            className="bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center justify-center space-x-2 text-sm sm:text-base"
           >
-            <RefreshCw className="h-5 w-5" />
-            <span className="hidden sm:inline">Refresh</span>
+            <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span>Refresh</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+            className="bg-blue-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2 text-sm sm:text-base"
           >
-            <Plus className="h-5 w-5" />
-            <span className="hidden sm:inline">Add Member</span>
+            <Plus className="h-4 w-4 sm:h-5 sm:w-5" />
+            <span>Add Member</span>
           </button>
         </div>
       </div>
 
       {/* Search */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           <input
@@ -113,7 +113,7 @@ const MemberManagement = () => {
             placeholder="Search members by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent w-full"
+            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent w-full text-base"
           />
         </div>
       </div>

@@ -225,14 +225,14 @@ const VisitorsManagement = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">People Management</h1>
-          <p className="text-gray-600 mt-1">Manage all library visitors, members, and staff</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">People Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage all library visitors, members, and staff</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base w-full sm:w-auto"
         >
           <Plus className="h-4 w-4" />
           <span>Add Person</span>

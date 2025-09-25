@@ -21,7 +21,8 @@ import {
   Grid,
   List,
   GraduationCap,
-  Briefcase
+  Briefcase,
+  BarChart3
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -53,6 +54,8 @@ const UnifiedPeopleManagement = () => {
   const [editingPerson, setEditingPerson] = useState<Person | null>(null)
   const [viewingPerson, setViewingPerson] = useState<Person | null>(null)
   const [viewMode, setViewMode] = useState<'table' | 'cards'>('table')
+  const [stats, setStats] = useState<any>(null)
+  const [showStats, setShowStats] = useState(false)
   const [newPerson, setNewPerson] = useState({
     name: '',
     email: '',
@@ -72,7 +75,20 @@ const UnifiedPeopleManagement = () => {
   // Load persons on component mount
   useEffect(() => {
     fetchPersons()
+    fetchStats()
   }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/persons/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
 
   const fetchPersons = async () => {
     setLoading(true)
@@ -252,6 +268,13 @@ const UnifiedPeopleManagement = () => {
               <RefreshCw className="h-5 w-5" />
             )}
             <span>Refresh</span>
+          </button>
+          <button
+            onClick={() => setShowStats(true)}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2 w-full sm:w-auto justify-center"
+          >
+            <BarChart3 className="h-5 w-5" />
+            <span>Statistics</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
@@ -973,6 +996,114 @@ const UnifiedPeopleManagement = () => {
                   Close
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Statistics Modal */}
+      {showStats && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-medium text-gray-900">People Statistics</h2>
+                <button
+                  onClick={() => setShowStats(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {stats && (
+                <div className="space-y-6">
+                  {/* Overview Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        <Users className="h-8 w-8 text-blue-600" />
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-blue-600">Total People</p>
+                          <p className="text-2xl font-bold text-blue-900">{stats.overview.totalPeople}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        <GraduationCap className="h-8 w-8 text-green-600" />
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-green-600">Students</p>
+                          <p className="text-2xl font-bold text-green-900">{stats.overview.totalStudents}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-orange-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        <Briefcase className="h-8 w-8 text-orange-600" />
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-orange-600">Workers</p>
+                          <p className="text-2xl font-bold text-orange-900">{stats.overview.totalWorkers}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-purple-50 p-4 rounded-lg">
+                      <div className="flex items-center">
+                        <UserPlus className="h-8 w-8 text-purple-600" />
+                        <div className="ml-3">
+                          <p className="text-sm font-medium text-purple-600">Members</p>
+                          <p className="text-2xl font-bold text-purple-900">{stats.overview.totalMembers}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Detailed Statistics */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">Person Types</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Members</span>
+                          <span className="text-sm font-medium text-gray-900">{stats.overview.totalMembers}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Visitors</span>
+                          <span className="text-sm font-medium text-gray-900">{stats.overview.totalVisitors}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">Status Breakdown</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Active</span>
+                          <span className="text-sm font-medium text-green-600">{stats.overview.activePeople}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-gray-600">Inactive</span>
+                          <span className="text-sm font-medium text-gray-600">{stats.overview.inactivePeople}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Recent Activity */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-600">New people (last 30 days)</span>
+                      <span className="text-sm font-medium text-blue-600">{stats.overview.recentPeople}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

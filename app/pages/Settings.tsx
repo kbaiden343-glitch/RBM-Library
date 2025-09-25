@@ -15,7 +15,8 @@ import {
   EyeOff,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  RefreshCw
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -97,6 +98,13 @@ const Settings = () => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('theme', settings.theme)
       document.documentElement.setAttribute('data-theme', settings.theme)
+      
+      // Apply theme classes to body
+      if (settings.theme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
     }
   }, [settings.theme])
 
@@ -137,6 +145,27 @@ const Settings = () => {
   }
 
   const handleSave = async () => {
+    // Validate required fields
+    if (!settings.libraryName.trim()) {
+      toast.error('Library name is required')
+      return
+    }
+    
+    if (settings.maxBorrowDays < 1) {
+      toast.error('Maximum borrow days must be at least 1')
+      return
+    }
+    
+    if (settings.maxBooksPerMember < 1) {
+      toast.error('Maximum books per member must be at least 1')
+      return
+    }
+    
+    if (settings.overdueFinePerDay < 0) {
+      toast.error('Overdue fine cannot be negative')
+      return
+    }
+
     setSaving(true)
     try {
       const response = await fetch('/api/settings', {
@@ -148,6 +177,8 @@ const Settings = () => {
       })
 
       if (response.ok) {
+        const updatedSettings = await response.json()
+        setSettings(updatedSettings)
         toast.success('Settings saved successfully!')
       } else {
         const error = await response.json()
@@ -155,7 +186,7 @@ const Settings = () => {
       }
     } catch (error) {
       console.error('Error saving settings:', error)
-      toast.error('Failed to save settings')
+      toast.error('Failed to save settings. Please check your connection.')
     } finally {
       setSaving(false)
     }
@@ -177,17 +208,19 @@ const Settings = () => {
         const a = document.createElement('a')
         a.href = url
         a.download = `library-export-${new Date().toISOString().split('T')[0]}.json`
+        a.style.display = 'none'
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
         toast.success('Library data exported successfully!')
       } else {
-        toast.error('Failed to export data')
+        const error = await response.json()
+        toast.error(error.error || 'Failed to export data')
       }
     } catch (error) {
       console.error('Error exporting data:', error)
-      toast.error('Failed to export data')
+      toast.error('Failed to export data. Please check your connection.')
     }
   }
 
@@ -207,17 +240,19 @@ const Settings = () => {
         const a = document.createElement('a')
         a.href = url
         a.download = `library-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+        a.style.display = 'none'
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
         toast.success('Backup created successfully!')
       } else {
-        toast.error('Failed to create backup')
+        const error = await response.json()
+        toast.error(error.error || 'Failed to create backup')
       }
     } catch (error) {
       console.error('Error creating backup:', error)
-      toast.error('Failed to create backup')
+      toast.error('Failed to create backup. Please check your connection.')
     }
   }
 
@@ -609,9 +644,12 @@ const Settings = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-64 space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-gray-600">Loading settings...</span>
+        <div className="text-center">
+          <p className="text-gray-600 font-medium">Loading settings...</p>
+          <p className="text-sm text-gray-500">Please wait while we fetch your preferences</p>
+        </div>
       </div>
     )
   }
@@ -624,18 +662,33 @@ const Settings = () => {
           <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Settings</h1>
           <p className="text-gray-600 mt-2">Manage your library system preferences</p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={saving}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 w-full sm:w-auto justify-center"
-        >
-          {saving ? (
-            <Loader2 className="h-5 w-5 animate-spin" />
-          ) : (
-            <Save className="h-5 w-5" />
-          )}
-          <span>{saving ? 'Saving...' : 'Save Changes'}</span>
-        </button>
+        <div className="flex flex-col sm:flex-row gap-2">
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 w-full sm:w-auto justify-center"
+          >
+            {saving ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Save className="h-5 w-5" />
+            )}
+            <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+          </button>
+          
+          <button
+            onClick={loadSettings}
+            disabled={loading}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 w-full sm:w-auto justify-center"
+          >
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <RefreshCw className="h-5 w-5" />
+            )}
+            <span>Reset</span>
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">

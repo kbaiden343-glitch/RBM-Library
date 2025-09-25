@@ -49,7 +49,7 @@ export async function PUT(
 ) {
   try {
     const body = await request.json()
-    const { name, email, phone, address, personType, status, notes, emergencyContact } = body
+    const { name, email, phone, address, personType, occupationType, status, notes, emergencyContact } = body
 
     // Check if person exists
     const existingPerson = await prisma.person.findUnique({
@@ -86,6 +86,7 @@ export async function PUT(
         phone: phone !== undefined ? phone : existingPerson.phone,
         address: address !== undefined ? address : existingPerson.address,
         personType: personType || existingPerson.personType,
+        occupationType: occupationType || existingPerson.occupationType,
         status: status || existingPerson.status,
         notes: notes !== undefined ? notes : existingPerson.notes,
         emergencyContact: emergencyContact !== undefined ? emergencyContact : existingPerson.emergencyContact,

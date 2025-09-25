@@ -9,8 +9,7 @@ import SampleNotifications from './components/SampleNotifications'
 // import DataInitializer from './components/DataInitializer' // Disabled - manual operations only
 import Dashboard from './pages/Dashboard'
 import BookCatalog from './pages/BookCatalog'
-import MemberManagement from './pages/MemberManagement'
-import VisitorsManagement from './pages/VisitorsManagement'
+import UnifiedPeopleManagement from './pages/UnifiedPeopleManagement'
 import BorrowingSystem from './pages/BorrowingSystem'
 import AttendanceManagement from './pages/AttendanceManagement'
 import UnifiedAttendance from './pages/UnifiedAttendance'
@@ -69,10 +68,8 @@ export default function Home() {
         return <Dashboard />
       case 'catalog':
         return <BookCatalog />
-      case 'members':
-        return <MemberManagement />
-      case 'visitors':
-        return <VisitorsManagement />
+      case 'people':
+        return <UnifiedPeopleManagement />
       case 'borrowing':
         return <BorrowingSystem />
       case 'attendance':

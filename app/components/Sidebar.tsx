@@ -28,8 +28,7 @@ const Sidebar = ({ activePage, setActivePage, onClose }: SidebarProps) => {
   const menuItems = [
     { key: 'dashboard', icon: Home, label: 'Dashboard', permission: 'dashboard:read' },
     { key: 'catalog', icon: BookOpen, label: 'Book Catalog', permission: 'books:read' },
-    { key: 'members', icon: Users, label: 'Member Management', permission: 'members:read' },
-    { key: 'visitors', icon: UserPlus, label: 'People Management', permission: 'members:read' },
+    { key: 'people', icon: Users, label: 'People Management', permission: 'members:read' },
     { key: 'borrowing', icon: BookMarked, label: 'Borrowing System', permission: 'borrowing:read' },
     { key: 'attendance', icon: UserCheck, label: 'Attendance (Unified)', permission: 'manage_attendance' },
     { key: 'users', icon: Shield, label: 'User Management', permission: 'all' },

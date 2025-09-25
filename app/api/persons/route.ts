@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50')
     const search = searchParams.get('search') || ''
     const personType = searchParams.get('personType') || ''
+    const occupationType = searchParams.get('occupationType') || ''
     const status = searchParams.get('status') || ''
 
     const skip = (page - 1) * limit
@@ -25,6 +26,10 @@ export async function GET(request: NextRequest) {
     
     if (personType && personType !== 'all') {
       where.personType = personType
+    }
+    
+    if (occupationType && occupationType !== 'all') {
+      where.occupationType = occupationType
     }
     
     if (status && status !== 'all') {
@@ -62,7 +67,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, phone, address, personType, notes, emergencyContact } = body
+    const { name, email, phone, address, personType, occupationType, notes, emergencyContact } = body
 
     // Validate required fields
     if (!name || !email) {
@@ -116,6 +121,7 @@ export async function POST(request: NextRequest) {
         phone: phone || null,
         address: address || null,
         personType: personType || 'VISITOR',
+        occupationType: occupationType || 'STUDENT',
         notes: notes || null,
         emergencyContact: emergencyContact || null,
         membershipDate: personType === 'MEMBER' ? new Date() : null,

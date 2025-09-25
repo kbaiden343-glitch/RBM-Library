@@ -47,6 +47,7 @@ model Person {
   phone            String?
   address          String?
   personType       PersonType    @default(VISITOR)
+  occupationType   OccupationType @default(STUDENT)
   membershipDate   DateTime?
   status           PersonStatus  @default(ACTIVE)
   notes            String?
@@ -60,6 +61,7 @@ model Person {
 
   @@index([status])
   @@index([personType])
+  @@index([occupationType])
   @@index([createdAt])
   @@map("persons")
 }
@@ -160,9 +162,11 @@ enum BookStatus {
 enum PersonType {
   MEMBER
   VISITOR
-  VIP
+}
+
+enum OccupationType {
   STUDENT
-  STAFF
+  WORKER
 }
 
 enum PersonStatus {

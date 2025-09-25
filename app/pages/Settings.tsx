@@ -1,12 +1,64 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Settings as SettingsIcon, User, Bell, Shield, Database, Palette, Save } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { 
+  Settings as SettingsIcon, 
+  User, 
+  Bell, 
+  Shield, 
+  Database, 
+  Palette, 
+  Save, 
+  Download, 
+  Upload,
+  Eye,
+  EyeOff,
+  CheckCircle,
+  AlertCircle,
+  Loader2
+} from 'lucide-react'
+import toast from 'react-hot-toast'
+
+interface SettingsData {
+  id?: string
+  libraryName: string
+  libraryAddress: string
+  libraryEmail: string
+  libraryPhone: string
+  maxBorrowDays: number
+  maxBooksPerMember: number
+  overdueFinePerDay: number
+  notifications: {
+    email: boolean
+    sms: boolean
+    overdue: boolean
+    reservations: boolean
+  }
+  theme: string
+  language: string
+}
+
+interface SecurityForm {
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('general')
-  const [settings, setSettings] = useState({
+  const [loading, setLoading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    new: false,
+    confirm: false
+  })
+  
+  const [settings, setSettings] = useState<SettingsData>({
     libraryName: 'Robert Aboagye Mensah Community Library',
+    libraryAddress: '',
+    libraryEmail: '',
+    libraryPhone: '',
     maxBorrowDays: 14,
     maxBooksPerMember: 5,
     overdueFinePerDay: 0.50,
@@ -20,6 +72,12 @@ const Settings = () => {
     language: 'en'
   })
 
+  const [securityForm, setSecurityForm] = useState<SecurityForm>({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  })
+
   const tabs = [
     { id: 'general', label: 'General', icon: SettingsIcon },
     { id: 'borrowing', label: 'Borrowing Rules', icon: User },
@@ -28,6 +86,37 @@ const Settings = () => {
     { id: 'backup', label: 'Backup & Export', icon: Database },
     { id: 'appearance', label: 'Appearance', icon: Palette }
   ]
+
+  // Load settings on component mount
+  useEffect(() => {
+    loadSettings()
+  }, [])
+
+  // Apply theme changes immediately
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('theme', settings.theme)
+      document.documentElement.setAttribute('data-theme', settings.theme)
+    }
+  }, [settings.theme])
+
+  const loadSettings = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch('/api/settings')
+      if (response.ok) {
+        const data = await response.json()
+        setSettings(data)
+      } else {
+        toast.error('Failed to load settings')
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error)
+      toast.error('Failed to load settings')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSettingChange = (key: string, value: any) => {
     if (key.includes('.')) {
@@ -47,32 +136,165 @@ const Settings = () => {
     }
   }
 
-  const handleSave = () => {
-    // Save settings logic here
-    console.log('Settings saved:', settings)
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      const response = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      })
+
+      if (response.ok) {
+        toast.success('Settings saved successfully!')
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Failed to save settings')
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error)
+      toast.error('Failed to save settings')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleExport = async () => {
+    try {
+      const response = await fetch('/api/settings/backup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: 'export' }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `library-export-${new Date().toISOString().split('T')[0]}.json`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        toast.success('Library data exported successfully!')
+      } else {
+        toast.error('Failed to export data')
+      }
+    } catch (error) {
+      console.error('Error exporting data:', error)
+      toast.error('Failed to export data')
+    }
+  }
+
+  const handleBackup = async () => {
+    try {
+      const response = await fetch('/api/settings/backup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ type: 'backup' }),
+      })
+
+      if (response.ok) {
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `library-backup-${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+        toast.success('Backup created successfully!')
+      } else {
+        toast.error('Failed to create backup')
+      }
+    } catch (error) {
+      console.error('Error creating backup:', error)
+      toast.error('Failed to create backup')
+    }
+  }
+
+  const handleSecuritySubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (securityForm.newPassword !== securityForm.confirmPassword) {
+      toast.error('New passwords do not match')
+      return
+    }
+
+    if (securityForm.newPassword.length < 6) {
+      toast.error('New password must be at least 6 characters long')
+      return
+    }
+
+    try {
+      const response = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          currentPassword: securityForm.currentPassword,
+          newPassword: securityForm.newPassword,
+        }),
+      })
+
+      if (response.ok) {
+        toast.success('Password changed successfully!')
+        setSecurityForm({
+          currentPassword: '',
+          newPassword: '',
+          confirmPassword: ''
+        })
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Failed to change password')
+      }
+    } catch (error) {
+      console.error('Error changing password:', error)
+      toast.error('Failed to change password')
+    }
+  }
+
+  const togglePasswordVisibility = (field: keyof typeof showPasswords) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }))
   }
 
   const renderGeneralSettings = () => (
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Library Name
+          Library Name *
         </label>
         <input
           type="text"
           value={settings.libraryName}
           onChange={(e) => handleSettingChange('libraryName', e.target.value)}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+          required
         />
       </div>
+      
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
           Library Address
         </label>
         <textarea
           rows={3}
+          value={settings.libraryAddress}
+          onChange={(e) => handleSettingChange('libraryAddress', e.target.value)}
           placeholder="Enter library address..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
         />
       </div>
       
@@ -81,16 +303,24 @@ const Settings = () => {
           Contact Information
         </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="email"
-            placeholder="Email address"
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-          />
-          <input
-            type="tel"
-            placeholder="Phone number"
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-          />
+          <div>
+            <input
+              type="email"
+              value={settings.libraryEmail}
+              onChange={(e) => handleSettingChange('libraryEmail', e.target.value)}
+              placeholder="Email address"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+            />
+          </div>
+          <div>
+            <input
+              type="tel"
+              value={settings.libraryPhone}
+              onChange={(e) => handleSettingChange('libraryPhone', e.target.value)}
+              placeholder="Phone number"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -100,38 +330,46 @@ const Settings = () => {
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Maximum Borrow Days
+          Maximum Borrow Days *
         </label>
         <input
           type="number"
+          min="1"
           value={settings.maxBorrowDays}
           onChange={(e) => handleSettingChange('maxBorrowDays', parseInt(e.target.value))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+          required
         />
         <p className="text-sm text-gray-500 mt-1">Number of days a book can be borrowed</p>
       </div>
+      
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Maximum Books Per Member
+          Maximum Books Per Member *
         </label>
         <input
           type="number"
+          min="1"
           value={settings.maxBooksPerMember}
           onChange={(e) => handleSettingChange('maxBooksPerMember', parseInt(e.target.value))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+          required
         />
         <p className="text-sm text-gray-500 mt-1">Maximum number of books a member can borrow at once</p>
       </div>
+      
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Overdue Fine Per Day ($)
+          Overdue Fine Per Day ($) *
         </label>
         <input
           type="number"
           step="0.01"
+          min="0"
           value={settings.overdueFinePerDay}
           onChange={(e) => handleSettingChange('overdueFinePerDay', parseFloat(e.target.value))}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+          required
         />
         <p className="text-sm text-gray-500 mt-1">Fine amount charged per day for overdue books</p>
       </div>
@@ -143,50 +381,207 @@ const Settings = () => {
       <div>
         <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h3>
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-900">Email Notifications</p>
-              <p className="text-sm text-gray-500">Receive notifications via email</p>
+          {[
+            { key: 'email', label: 'Email Notifications', description: 'Receive notifications via email' },
+            { key: 'sms', label: 'SMS Notifications', description: 'Receive notifications via SMS' },
+            { key: 'overdue', label: 'Overdue Alerts', description: 'Get notified about overdue books' },
+            { key: 'reservations', label: 'Reservation Alerts', description: 'Get notified about reservations' }
+          ].map((notification) => (
+            <div key={notification.key} className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-900">{notification.label}</p>
+                <p className="text-sm text-gray-500">{notification.description}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.notifications[notification.key as keyof typeof settings.notifications]}
+                  onChange={(e) => handleSettingChange(`notifications.${notification.key}`, e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.email}
-                onChange={(e) => handleSettingChange('notifications.email', e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderSecuritySettings = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Change Password</h3>
+        <form onSubmit={handleSecuritySubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Current Password
             </label>
+            <div className="relative">
+              <input
+                type={showPasswords.current ? "text" : "password"}
+                value={securityForm.currentPassword}
+                onChange={(e) => setSecurityForm(prev => ({ ...prev, currentPassword: e.target.value }))}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('current')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                {showPasswords.current ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-900">SMS Notifications</p>
-              <p className="text-sm text-gray-500">Receive notifications via SMS</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.sms}
-                onChange={(e) => handleSettingChange('notifications.sms', e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              New Password
             </label>
+            <div className="relative">
+              <input
+                type={showPasswords.new ? "text" : "password"}
+                value={securityForm.newPassword}
+                onChange={(e) => setSecurityForm(prev => ({ ...prev, newPassword: e.target.value }))}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('new')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                {showPasswords.new ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-900">Overdue Alerts</p>
-              <p className="text-sm text-gray-500">Get notified about overdue books</p>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.notifications.overdue}
-                onChange={(e) => handleSettingChange('notifications.overdue', e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Confirm New Password
             </label>
+            <div className="relative">
+              <input
+                type={showPasswords.confirm ? "text" : "password"}
+                value={securityForm.confirmPassword}
+                onChange={(e) => setSecurityForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('confirm')}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                {showPasswords.confirm ? (
+                  <EyeOff className="h-5 w-5 text-gray-400" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400" />
+                )}
+              </button>
+            </div>
+          </div>
+          
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          >
+            <Shield className="h-5 w-5" />
+            <span>Change Password</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+
+  const renderBackupSettings = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Backup & Export</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center space-x-3 mb-3">
+              <Download className="h-8 w-8 text-green-600" />
+              <div>
+                <h4 className="font-medium text-gray-900">Export Library Data</h4>
+                <p className="text-sm text-gray-500">Download all library data as JSON</p>
+              </div>
+            </div>
+            <button
+              onClick={handleExport}
+              className="w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center justify-center space-x-2"
+            >
+              <Download className="h-5 w-5" />
+              <span>Export Data</span>
+            </button>
+          </div>
+          
+          <div className="p-4 border border-gray-200 rounded-lg">
+            <div className="flex items-center space-x-3 mb-3">
+              <Database className="h-8 w-8 text-blue-600" />
+              <div>
+                <h4 className="font-medium text-gray-900">Create Backup</h4>
+                <p className="text-sm text-gray-500">Create a complete backup with timestamp</p>
+              </div>
+            </div>
+            <button
+              onClick={handleBackup}
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center space-x-2"
+            >
+              <Database className="h-5 w-5" />
+              <span>Create Backup</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderAppearanceSettings = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Appearance</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Theme
+            </label>
+            <select
+              value={settings.theme}
+              onChange={(e) => handleSettingChange('theme', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+            >
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="auto">Auto (System)</option>
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Language
+            </label>
+            <select
+              value={settings.language}
+              onChange={(e) => handleSettingChange('language', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
+            >
+              <option value="en">English</option>
+              <option value="es">Español</option>
+              <option value="fr">Français</option>
+              <option value="de">Deutsch</option>
+            </select>
           </div>
         </div>
       </div>
@@ -202,65 +597,44 @@ const Settings = () => {
       case 'notifications':
         return renderNotificationSettings()
       case 'security':
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium text-gray-900">Security Settings</h3>
-            <p className="text-gray-600">Security settings will be available in a future update.</p>
-          </div>
-        )
+        return renderSecuritySettings()
       case 'backup':
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium text-gray-900">Backup & Export</h3>
-            <div className="space-y-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
-                Export Library Data
-              </button>
-              <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                Create Backup
-              </button>
-            </div>
-          </div>
-        )
+        return renderBackupSettings()
       case 'appearance':
-        return (
-          <div className="space-y-6">
-            <h3 className="text-lg font-medium text-gray-900">Appearance</h3>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Theme
-              </label>
-              <select
-                value={settings.theme}
-                onChange={(e) => handleSettingChange('theme', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-              >
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="auto">Auto</option>
-              </select>
-            </div>
-          </div>
-        )
+        return renderAppearanceSettings()
       default:
         return renderGeneralSettings()
     }
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+        <span className="ml-2 text-gray-600">Loading settings...</span>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Settings</h1>
           <p className="text-gray-600 mt-2">Manage your library system preferences</p>
         </div>
         <button
           onClick={handleSave}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          disabled={saving}
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2 w-full sm:w-auto justify-center"
         >
-          <Save className="h-5 w-5" />
-          <span>Save Changes</span>
+          {saving ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Save className="h-5 w-5" />
+          )}
+          <span>{saving ? 'Saving...' : 'Save Changes'}</span>
         </button>
       </div>
 
@@ -290,7 +664,7 @@ const Settings = () => {
 
         {/* Settings Content */}
         <div className="lg:col-span-3">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+          <div className="bg-white p-4 lg:p-6 rounded-lg shadow-sm border border-gray-200">
             {renderTabContent()}
           </div>
         </div>

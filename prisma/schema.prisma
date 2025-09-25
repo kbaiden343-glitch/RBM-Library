@@ -188,3 +188,21 @@ enum ReservationStatus {
   READY
   CANCELLED
 }
+
+model Settings {
+  id                String    @id @default(cuid())
+  libraryName       String    @default("Robert Aboagye Mensah Community Library")
+  libraryAddress    String?
+  libraryEmail      String?
+  libraryPhone      String?
+  maxBorrowDays     Int       @default(14)
+  maxBooksPerMember Int       @default(5)
+  overdueFinePerDay Float     @default(0.50)
+  notifications     Json      @default("{\"email\":true,\"sms\":false,\"overdue\":true,\"reservations\":true}")
+  theme             String    @default("light")
+  language          String    @default("en")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("settings")
+}

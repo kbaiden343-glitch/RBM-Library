@@ -46,21 +46,23 @@ export async function GET(request: NextRequest) {
         } 
       }),
       
-      // Total students
-      prisma.person.count({ 
-        where: { 
-          ...dateFilter,
-          occupationType: 'STUDENT' 
-        } 
-      }),
+      // Total students (skip for now until database migration)
+      // prisma.person.count({ 
+      //   where: { 
+      //     ...dateFilter,
+      //     occupationType: 'STUDENT' 
+      //   } 
+      // }),
+      0, // Placeholder for students count
       
-      // Total workers
-      prisma.person.count({ 
-        where: { 
-          ...dateFilter,
-          occupationType: 'WORKER' 
-        } 
-      }),
+      // Total workers (skip for now until database migration)
+      // prisma.person.count({ 
+      //   where: { 
+      //     ...dateFilter,
+      //     occupationType: 'WORKER' 
+      //   } 
+      // }),
+      0, // Placeholder for workers count
       
       // Active people
       prisma.person.count({ 

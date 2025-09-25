@@ -33,7 +33,7 @@ interface Person {
   phone?: string
   address?: string
   personType: 'MEMBER' | 'VISITOR'
-  occupationType: 'STUDENT' | 'WORKER'
+  occupationType?: 'STUDENT' | 'WORKER' // Optional until database migration
   status: 'ACTIVE' | 'INACTIVE' | 'BANNED' | 'SUSPENDED'
   notes?: string
   emergencyContact?: string
@@ -114,7 +114,7 @@ const UnifiedPeopleManagement = () => {
                          (person.phone && person.phone.includes(searchTerm))
     
     const matchesPersonType = filterPersonType === 'all' || person.personType === filterPersonType
-    const matchesOccupationType = filterOccupationType === 'all' || person.occupationType === filterOccupationType
+    const matchesOccupationType = filterOccupationType === 'all' || person.occupationType === filterOccupationType || !person.occupationType
     const matchesStatus = filterStatus === 'all' || person.status === filterStatus
 
     return matchesSearch && matchesPersonType && matchesOccupationType && matchesStatus
@@ -396,7 +396,7 @@ const UnifiedPeopleManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Students</p>
               <p className="text-2xl font-bold text-gray-900">
-                {persons.filter(p => p.occupationType === 'STUDENT').length}
+                {persons.filter(p => p.occupationType === 'STUDENT').length || 'N/A'}
               </p>
             </div>
           </div>
@@ -410,7 +410,7 @@ const UnifiedPeopleManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Workers</p>
               <p className="text-2xl font-bold text-gray-900">
-                {persons.filter(p => p.occupationType === 'WORKER').length}
+                {persons.filter(p => p.occupationType === 'WORKER').length || 'N/A'}
               </p>
             </div>
           </div>
@@ -486,9 +486,9 @@ const UnifiedPeopleManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        {getOccupationIcon(person.occupationType)}
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(person.occupationType)}`}>
-                          {person.occupationType}
+                        {getOccupationIcon(person.occupationType || 'STUDENT')}
+                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(person.occupationType || 'STUDENT')}`}>
+                          {person.occupationType || 'N/A'}
                         </span>
                       </div>
                     </td>
@@ -579,9 +579,9 @@ const UnifiedPeopleManagement = () => {
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPersonTypeColor(person.personType)}`}>
                       {person.personType}
                     </span>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(person.occupationType)}`}>
-                      {getOccupationIcon(person.occupationType)}
-                      <span className="ml-1">{person.occupationType}</span>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(person.occupationType || 'STUDENT')}`}>
+                      {getOccupationIcon(person.occupationType || 'STUDENT')}
+                      <span className="ml-1">{person.occupationType || 'N/A'}</span>
                     </span>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(person.status)}`}>
                       {person.status}
@@ -687,10 +687,9 @@ const UnifiedPeopleManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Occupation Type *
+                    Occupation Type
                   </label>
                   <select
-                    required
                     value={newPerson.occupationType}
                     onChange={(e) => setNewPerson({...newPerson, occupationType: e.target.value as 'STUDENT' | 'WORKER'})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
@@ -698,6 +697,7 @@ const UnifiedPeopleManagement = () => {
                     <option value="STUDENT">Student</option>
                     <option value="WORKER">Worker</option>
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">Optional - will be available after database migration</p>
                 </div>
 
                 <div>
@@ -836,17 +836,17 @@ const UnifiedPeopleManagement = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Occupation Type *
+                    Occupation Type
                   </label>
                   <select
-                    required
-                    value={editingPerson.occupationType}
+                    value={editingPerson.occupationType || 'STUDENT'}
                     onChange={(e) => setEditingPerson({...editingPerson, occupationType: e.target.value as 'STUDENT' | 'WORKER'})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
                   >
                     <option value="STUDENT">Student</option>
                     <option value="WORKER">Worker</option>
                   </select>
+                  <p className="text-xs text-gray-500 mt-1">Optional - will be available after database migration</p>
                 </div>
 
                 <div>

@@ -28,8 +28,10 @@ export async function GET(request: NextRequest) {
       where.personType = personType
     }
     
+    // Only filter by occupationType if the field exists in the database
     if (occupationType && occupationType !== 'all') {
-      where.occupationType = occupationType
+      // For now, we'll skip this filter until the database is migrated
+      // where.occupationType = occupationType
     }
     
     if (status && status !== 'all') {
@@ -114,18 +116,24 @@ export async function POST(request: NextRequest) {
     }
 
     // Create person record
+    const personData: any = {
+      name,
+      email,
+      phone: phone || null,
+      address: address || null,
+      personType: personType || 'VISITOR',
+      notes: notes || null,
+      emergencyContact: emergencyContact || null,
+      membershipDate: personType === 'MEMBER' ? new Date() : null,
+    }
+
+    // Only add occupationType if it's provided (after database migration)
+    if (occupationType) {
+      personData.occupationType = occupationType
+    }
+
     const person = await prisma.person.create({
-      data: {
-        name,
-        email,
-        phone: phone || null,
-        address: address || null,
-        personType: personType || 'VISITOR',
-        occupationType: occupationType || 'STUDENT',
-        notes: notes || null,
-        emergencyContact: emergencyContact || null,
-        membershipDate: personType === 'MEMBER' ? new Date() : null,
-      },
+      data: personData,
     })
 
     console.log('Person created successfully:', { 

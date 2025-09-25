@@ -78,22 +78,28 @@ export async function PUT(
     }
 
     // Update person
+    const updateData: any = {
+      name: name || existingPerson.name,
+      email: email || existingPerson.email,
+      phone: phone !== undefined ? phone : existingPerson.phone,
+      address: address !== undefined ? address : existingPerson.address,
+      personType: personType || existingPerson.personType,
+      status: status || existingPerson.status,
+      notes: notes !== undefined ? notes : existingPerson.notes,
+      emergencyContact: emergencyContact !== undefined ? emergencyContact : existingPerson.emergencyContact,
+      membershipDate: personType === 'MEMBER' && !existingPerson.membershipDate 
+        ? new Date() 
+        : existingPerson.membershipDate,
+    }
+
+    // Only update occupationType if it's provided (after database migration)
+    if (occupationType) {
+      updateData.occupationType = occupationType
+    }
+
     const person = await prisma.person.update({
       where: { id: params.id },
-      data: {
-        name: name || existingPerson.name,
-        email: email || existingPerson.email,
-        phone: phone !== undefined ? phone : existingPerson.phone,
-        address: address !== undefined ? address : existingPerson.address,
-        personType: personType || existingPerson.personType,
-        occupationType: occupationType || existingPerson.occupationType,
-        status: status || existingPerson.status,
-        notes: notes !== undefined ? notes : existingPerson.notes,
-        emergencyContact: emergencyContact !== undefined ? emergencyContact : existingPerson.emergencyContact,
-        membershipDate: personType === 'MEMBER' && !existingPerson.membershipDate 
-          ? new Date() 
-          : existingPerson.membershipDate,
-      },
+      data: updateData,
     })
 
     return NextResponse.json(person)

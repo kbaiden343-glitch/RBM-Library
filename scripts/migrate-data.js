@@ -8,11 +8,11 @@ async function migrateData() {
 
     // Create default admin user
     const adminUser = await prisma.user.upsert({
-      where: { email: 'admin' },
+      where: { email: 'admin@library.com' },
       update: {},
       create: {
         name: 'System Administrator',
-        email: 'admin',
+        email: 'admin@library.com',
         password: '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W', // 'password'
         role: 'ADMIN',
       },
@@ -22,11 +22,11 @@ async function migrateData() {
 
     // Create default librarian user
     const librarianUser = await prisma.user.upsert({
-      where: { email: 'librarian' },
+      where: { email: 'librarian@library.com' },
       update: {},
       create: {
         name: 'Library Staff',
-        email: 'librarian',
+        email: 'librarian@library.com',
         password: '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W', // 'password'
         role: 'LIBRARIAN',
       },
@@ -36,11 +36,11 @@ async function migrateData() {
 
     // Create default member user
     const memberUser = await prisma.user.upsert({
-      where: { email: 'member' },
+      where: { email: 'member@library.com' },
       update: {},
       create: {
         name: 'Library Member',
-        email: 'member',
+        email: 'member@library.com',
         password: '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W', // 'password'
         role: 'MEMBER',
       },

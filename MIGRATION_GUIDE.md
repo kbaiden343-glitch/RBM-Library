@@ -137,7 +137,7 @@ The system now automatically:
 
 ### Sample Data
 The migration includes:
-- **Default admin user** (admin / password)
+- **Default admin user** (admin@library.com / password)
 - **Sample books** across different categories
 - **Sample members** with realistic data
 - **Sample borrowing records** and reservations

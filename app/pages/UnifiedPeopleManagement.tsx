@@ -354,12 +354,12 @@ const UnifiedPeopleManagement = () => {
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
-              <GraduationCap className="h-6 w-6 text-green-600" />
+              <Users className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Students</p>
+              <p className="text-sm font-medium text-gray-600">Visitors</p>
               <p className="text-2xl font-bold text-gray-900">
-                {(persons || []).filter(p => p.occupationType === 'STUDENT').length || 0}
+                {(persons || []).filter(p => p.personType === 'VISITOR').length}
               </p>
             </div>
           </div>
@@ -368,12 +368,12 @@ const UnifiedPeopleManagement = () => {
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-orange-100 rounded-lg">
-              <Briefcase className="h-6 w-6 text-orange-600" />
+              <AlertCircle className="h-6 w-6 text-orange-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Workers</p>
+              <p className="text-sm font-medium text-gray-600">Active</p>
               <p className="text-2xl font-bold text-gray-900">
-                {(persons || []).filter(p => p.occupationType === 'WORKER').length || 0}
+                {(persons || []).filter(p => p.status === 'ACTIVE').length}
               </p>
             </div>
           </div>
@@ -553,7 +553,7 @@ const UnifiedPeopleManagement = () => {
             <Users className="mx-auto h-12 w-12 text-gray-400" />
             <h3 className="mt-2 text-sm font-medium text-gray-900">No people found</h3>
             <p className="mt-1 text-sm text-gray-500">
-              {searchTerm || filterPersonType !== 'all' || filterOccupationType !== 'all' || filterStatus !== 'all'
+              {searchTerm || filterPersonType !== 'all' || filterStatus !== 'all'
                 ? 'Try adjusting your search or filters.'
                 : 'Get started by adding a new person.'}
             </p>

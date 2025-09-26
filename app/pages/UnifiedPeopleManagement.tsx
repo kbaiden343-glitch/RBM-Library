@@ -20,7 +20,15 @@ import {
   RefreshCw,
   Grid,
   List,
-  BarChart3
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Download,
+  X,
+  CheckCircle,
+  XCircle,
+  Ban,
+  Pause
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -339,7 +347,7 @@ const UnifiedPeopleManagement = () => {
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-2 bg-blue-100 rounded-lg">
               <Users className="h-6 w-6 text-blue-600" />
@@ -347,39 +355,29 @@ const UnifiedPeopleManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total People</p>
               <p className="text-2xl font-bold text-gray-900">{(persons || []).length}</p>
+              <p className="text-xs text-gray-500">All registered</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
-              <Users className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Visitors</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {(persons || []).filter(p => p.personType === 'VISITOR').length}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <AlertCircle className="h-6 w-6 text-orange-600" />
+              <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Active</p>
               <p className="text-2xl font-bold text-gray-900">
                 {(persons || []).filter(p => p.status === 'ACTIVE').length}
               </p>
+              <p className="text-xs text-gray-500">
+                {((persons || []).filter(p => p.status === 'ACTIVE').length / Math.max((persons || []).length, 1) * 100).toFixed(1)}%
+              </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <div className="flex items-center">
             <div className="p-2 bg-purple-100 rounded-lg">
               <UserPlus className="h-6 w-6 text-purple-600" />
@@ -388,6 +386,71 @@ const UnifiedPeopleManagement = () => {
               <p className="text-sm font-medium text-gray-600">Members</p>
               <p className="text-2xl font-bold text-gray-900">
                 {(persons || []).filter(p => p.personType === 'MEMBER').length}
+              </p>
+              <p className="text-xs text-gray-500">
+                {((persons || []).filter(p => p.personType === 'MEMBER').length / Math.max((persons || []).length, 1) * 100).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-orange-100 rounded-lg">
+              <Users className="h-6 w-6 text-orange-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Visitors</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {(persons || []).filter(p => p.personType === 'VISITOR').length}
+              </p>
+              <p className="text-xs text-gray-500">
+                {((persons || []).filter(p => p.personType === 'VISITOR').length / Math.max((persons || []).length, 1) * 100).toFixed(1)}%
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Additional Status Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-gray-100 rounded-lg">
+              <XCircle className="h-6 w-6 text-gray-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Inactive</p>
+              <p className="text-xl font-bold text-gray-900">
+                {(persons || []).filter(p => p.status === 'INACTIVE').length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-red-100 rounded-lg">
+              <Ban className="h-6 w-6 text-red-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Banned</p>
+              <p className="text-xl font-bold text-gray-900">
+                {(persons || []).filter(p => p.status === 'BANNED').length}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <div className="flex items-center">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <Pause className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-600">Suspended</p>
+              <p className="text-xl font-bold text-gray-900">
+                {(persons || []).filter(p => p.status === 'SUSPENDED').length}
               </p>
             </div>
           </div>
@@ -915,83 +978,238 @@ const UnifiedPeopleManagement = () => {
       {/* Statistics Modal */}
       {showStats && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-medium text-gray-900">People Statistics</h2>
-                <button
-                  onClick={() => setShowStats(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">People Analytics Dashboard</h2>
+                  <p className="text-gray-600 mt-1">Comprehensive statistics and insights</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => {
+                      // Export statistics functionality
+                      const dataStr = JSON.stringify(stats, null, 2)
+                      const dataBlob = new Blob([dataStr], {type: 'application/json'})
+                      const url = URL.createObjectURL(dataBlob)
+                      const link = document.createElement('a')
+                      link.href = url
+                      link.download = `people-statistics-${new Date().toISOString().split('T')[0]}.json`
+                      link.click()
+                      URL.revokeObjectURL(url)
+                      toast.success('Statistics exported successfully!')
+                    }}
+                    className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Export</span>
+                  </button>
+                  <button
+                    onClick={() => setShowStats(false)}
+                    className="text-gray-400 hover:text-gray-600 p-2"
+                  >
+                    <X className="h-6 w-6" />
+                  </button>
+                </div>
               </div>
 
               {stats && (
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {/* Overview Cards */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <div className="flex items-center">
-                        <Users className="h-8 w-8 text-blue-600" />
-                        <div className="ml-3">
+                    <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-xl border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <div>
                           <p className="text-sm font-medium text-blue-600">Total People</p>
-                          <p className="text-2xl font-bold text-blue-900">{stats.overview.totalPeople}</p>
+                          <p className="text-3xl font-bold text-blue-900">{stats.overview.totalPeople}</p>
+                          <p className="text-xs text-blue-700 mt-1">All registered</p>
                         </div>
+                        <Users className="h-12 w-12 text-blue-600 opacity-80" />
                       </div>
                     </div>
 
-
-                    <div className="bg-purple-50 p-4 rounded-lg">
-                      <div className="flex items-center">
-                        <UserPlus className="h-8 w-8 text-purple-600" />
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-purple-600">Members</p>
-                          <p className="text-2xl font-bold text-purple-900">{stats.overview.totalMembers}</p>
+                    <div className="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-xl border border-green-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-green-600">Active</p>
+                          <p className="text-3xl font-bold text-green-900">{stats.overview.activePeople}</p>
+                          <p className="text-xs text-green-700 mt-1">
+                            {((stats.overview.activePeople / Math.max(stats.overview.totalPeople, 1)) * 100).toFixed(1)}% of total
+                          </p>
                         </div>
+                        <CheckCircle className="h-12 w-12 text-green-600 opacity-80" />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-6 rounded-xl border border-purple-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-purple-600">Members</p>
+                          <p className="text-3xl font-bold text-purple-900">{stats.overview.totalMembers}</p>
+                          <p className="text-xs text-purple-700 mt-1">
+                            {((stats.overview.totalMembers / Math.max(stats.overview.totalPeople, 1)) * 100).toFixed(1)}% of total
+                          </p>
+                        </div>
+                        <UserPlus className="h-12 w-12 text-purple-600 opacity-80" />
+                      </div>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-orange-50 to-orange-100 p-6 rounded-xl border border-orange-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-orange-600">Visitors</p>
+                          <p className="text-3xl font-bold text-orange-900">{stats.overview.totalVisitors}</p>
+                          <p className="text-xs text-orange-700 mt-1">
+                            {((stats.overview.totalVisitors / Math.max(stats.overview.totalPeople, 1)) * 100).toFixed(1)}% of total
+                          </p>
+                        </div>
+                        <Users className="h-12 w-12 text-orange-600 opacity-80" />
                       </div>
                     </div>
                   </div>
 
                   {/* Detailed Statistics */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Person Types</h3>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Members</span>
-                          <span className="text-sm font-medium text-gray-900">{stats.overview.totalMembers}</span>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Person Types Chart */}
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <BarChart3 className="h-5 w-5 mr-2 text-blue-600" />
+                        Person Types Distribution
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 bg-purple-500 rounded-full mr-3"></div>
+                            <span className="text-sm font-medium text-gray-700">Members</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-gray-900">{stats.overview.totalMembers}</span>
+                            <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
+                              <div 
+                                className="bg-purple-500 h-2 rounded-full" 
+                                style={{width: `${(stats.overview.totalMembers / Math.max(stats.overview.totalPeople, 1)) * 100}%`}}
+                              ></div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Visitors</span>
-                          <span className="text-sm font-medium text-gray-900">{stats.overview.totalVisitors}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-4 h-4 bg-orange-500 rounded-full mr-3"></div>
+                            <span className="text-sm font-medium text-gray-700">Visitors</span>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-gray-900">{stats.overview.totalVisitors}</span>
+                            <div className="w-32 bg-gray-200 rounded-full h-2 mt-1">
+                              <div 
+                                className="bg-orange-500 h-2 rounded-full" 
+                                style={{width: `${(stats.overview.totalVisitors / Math.max(stats.overview.totalPeople, 1)) * 100}%`}}
+                              ></div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">Status Breakdown</h3>
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Active</span>
-                          <span className="text-sm font-medium text-green-600">{stats.overview.activePeople}</span>
+                    {/* Status Breakdown */}
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <AlertCircle className="h-5 w-5 mr-2 text-green-600" />
+                        Status Breakdown
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <CheckCircle className="h-4 w-4 text-green-600 mr-3" />
+                            <span className="text-sm font-medium text-gray-700">Active</span>
+                          </div>
+                          <span className="text-lg font-bold text-green-600">{stats.overview.activePeople}</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm text-gray-600">Inactive</span>
-                          <span className="text-sm font-medium text-gray-600">{stats.overview.inactivePeople}</span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <XCircle className="h-4 w-4 text-gray-600 mr-3" />
+                            <span className="text-sm font-medium text-gray-700">Inactive</span>
+                          </div>
+                          <span className="text-lg font-bold text-gray-600">{stats.overview.inactivePeople}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Ban className="h-4 w-4 text-red-600 mr-3" />
+                            <span className="text-sm font-medium text-gray-700">Banned</span>
+                          </div>
+                          <span className="text-lg font-bold text-red-600">
+                            {stats.overview.bannedPeople || 0}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Pause className="h-4 w-4 text-yellow-600 mr-3" />
+                            <span className="text-sm font-medium text-gray-700">Suspended</span>
+                          </div>
+                          <span className="text-lg font-bold text-yellow-600">
+                            {stats.overview.suspendedPeople || 0}
+                          </span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Recent Activity */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h3>
-                    <div className="flex justify-between">
-                      <span className="text-sm text-gray-600">New people (last 30 days)</span>
-                      <span className="text-sm font-medium text-blue-600">{stats.overview.recentPeople}</span>
+                  {/* Trends and Activity */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Recent Activity */}
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <TrendingUp className="h-5 w-5 mr-2 text-blue-600" />
+                        Recent Activity
+                      </h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                          <div className="flex items-center">
+                            <Calendar className="h-4 w-4 text-blue-600 mr-3" />
+                            <span className="text-sm font-medium text-gray-700">New people (last 30 days)</span>
+                          </div>
+                          <span className="text-xl font-bold text-blue-600">{stats.overview.recentPeople}</span>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                          <div className="flex items-center">
+                            <Clock className="h-4 w-4 text-green-600 mr-3" />
+                            <span className="text-sm font-medium text-gray-700">Growth rate</span>
+                          </div>
+                          <span className="text-xl font-bold text-green-600">
+                            {stats.overview.totalPeople > 0 ? 
+                              ((stats.overview.recentPeople / stats.overview.totalPeople) * 100).toFixed(1) : 0}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Quick Insights */}
+                    <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <BarChart3 className="h-5 w-5 mr-2 text-purple-600" />
+                        Quick Insights
+                      </h3>
+                      <div className="space-y-3">
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600">
+                            <strong>Member Conversion Rate:</strong> {stats.insights?.memberConversionRate || 0}%
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600">
+                            <strong>Active Rate:</strong> {stats.insights?.activeRate || 0}%
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600">
+                            <strong>Average Daily Registrations:</strong> {stats.insights?.averageDailyRegistrations || 0} people/day
+                          </p>
+                        </div>
+                        <div className="p-3 bg-gray-50 rounded-lg">
+                          <p className="text-sm text-gray-600">
+                            <strong>Growth Rate (30 days):</strong> {stats.insights?.growthRate || 0}%
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

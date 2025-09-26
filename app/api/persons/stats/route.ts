@@ -16,16 +16,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Get statistics
+    // Get comprehensive statistics
     const [
       totalPeople,
       totalMembers,
       totalVisitors,
-      totalStudents,
-      totalWorkers,
       activePeople,
       inactivePeople,
-      recentPeople
+      bannedPeople,
+      suspendedPeople,
+      recentPeople,
+      weeklyPeople,
+      monthlyPeople
     ] = await Promise.all([
       // Total people
       prisma.person.count({ where: dateFilter }),
@@ -46,24 +48,6 @@ export async function GET(request: NextRequest) {
         } 
       }),
       
-      // Total students (skip for now until database migration)
-      // prisma.person.count({ 
-      //   where: { 
-      //     ...dateFilter,
-      //     occupationType: 'STUDENT' 
-      //   } 
-      // }),
-      0, // Placeholder for students count
-      
-      // Total workers (skip for now until database migration)
-      // prisma.person.count({ 
-      //   where: { 
-      //     ...dateFilter,
-      //     occupationType: 'WORKER' 
-      //   } 
-      // }),
-      0, // Placeholder for workers count
-      
       // Active people
       prisma.person.count({ 
         where: { 
@@ -80,7 +64,41 @@ export async function GET(request: NextRequest) {
         } 
       }),
       
+      // Banned people
+      prisma.person.count({ 
+        where: { 
+          ...dateFilter,
+          status: 'BANNED' 
+        } 
+      }),
+      
+      // Suspended people
+      prisma.person.count({ 
+        where: { 
+          ...dateFilter,
+          status: 'SUSPENDED' 
+        } 
+      }),
+      
       // Recent people (last 30 days)
+      prisma.person.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+          }
+        }
+      }),
+      
+      // Weekly people (last 7 days)
+      prisma.person.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+          }
+        }
+      }),
+      
+      // Monthly people (last 30 days)
       prisma.person.count({
         where: {
           createdAt: {
@@ -134,16 +152,30 @@ export async function GET(request: NextRequest) {
       })
     )
 
+    // Calculate growth rates and insights
+    const memberConversionRate = totalVisitors > 0 ? (totalMembers / (totalMembers + totalVisitors)) * 100 : 0
+    const activeRate = totalPeople > 0 ? (activePeople / totalPeople) * 100 : 0
+    const growthRate = totalPeople > 0 ? (recentPeople / totalPeople) * 100 : 0
+    const averageDailyRegistrations = recentPeople / 30
+
     return NextResponse.json({
       overview: {
         totalPeople,
         totalMembers,
         totalVisitors,
-        totalStudents,
-        totalWorkers,
         activePeople,
         inactivePeople,
-        recentPeople
+        bannedPeople,
+        suspendedPeople,
+        recentPeople,
+        weeklyPeople,
+        monthlyPeople
+      },
+      insights: {
+        memberConversionRate: Math.round(memberConversionRate * 10) / 10,
+        activeRate: Math.round(activeRate * 10) / 10,
+        growthRate: Math.round(growthRate * 10) / 10,
+        averageDailyRegistrations: Math.round(averageDailyRegistrations * 10) / 10
       },
       trends: {
         daily: dailyStats.reverse(), // Show oldest to newest

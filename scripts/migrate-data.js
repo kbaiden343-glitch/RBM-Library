@@ -13,7 +13,7 @@ async function migrateData() {
       create: {
         name: 'System Administrator',
         email: 'admin@library.com',
-        password: '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W', // 'password'
+        password: '$2b$12$RX7RSxeAQAUugIgaWC9o7eTJ9djMhS5zqIfV9eonriWr/B5JaxlM2', // 'password'
         role: 'ADMIN',
       },
     })
@@ -27,7 +27,7 @@ async function migrateData() {
       create: {
         name: 'Library Staff',
         email: 'librarian@library.com',
-        password: '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W', // 'password'
+        password: '$2b$12$RX7RSxeAQAUugIgaWC9o7eTJ9djMhS5zqIfV9eonriWr/B5JaxlM2', // 'password'
         role: 'LIBRARIAN',
       },
     })
@@ -41,7 +41,7 @@ async function migrateData() {
       create: {
         name: 'Library Member',
         email: 'member@library.com',
-        password: '$2b$12$nu3BiQV.n8m9hC7pTyl7V.pp2yM5ynbSiR9VB5kBXiazKwEiBt72W', // 'password'
+        password: '$2b$12$RX7RSxeAQAUugIgaWC9o7eTJ9djMhS5zqIfV9eonriWr/B5JaxlM2', // 'password'
         role: 'MEMBER',
       },
     })

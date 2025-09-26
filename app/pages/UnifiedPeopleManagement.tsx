@@ -96,7 +96,7 @@ const UnifiedPeopleManagement = () => {
       const response = await fetch('/api/persons')
       if (response.ok) {
         const data = await response.json()
-        setPersons(data)
+        setPersons(data.persons || [])
       } else {
         toast.error('Failed to fetch people data')
       }
@@ -108,7 +108,7 @@ const UnifiedPeopleManagement = () => {
     }
   }
 
-  const filteredPersons = persons.filter(person => {
+  const filteredPersons = (persons || []).filter(person => {
     const matchesSearch = person.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          person.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          (person.phone && person.phone.includes(searchTerm))
@@ -383,7 +383,7 @@ const UnifiedPeopleManagement = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Total People</p>
-              <p className="text-2xl font-bold text-gray-900">{persons.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{(persons || []).length}</p>
             </div>
           </div>
         </div>
@@ -396,7 +396,7 @@ const UnifiedPeopleManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Students</p>
               <p className="text-2xl font-bold text-gray-900">
-                {persons.filter(p => p.occupationType === 'STUDENT').length || 'N/A'}
+                {(persons || []).filter(p => p.occupationType === 'STUDENT').length || 0}
               </p>
             </div>
           </div>
@@ -410,7 +410,7 @@ const UnifiedPeopleManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Workers</p>
               <p className="text-2xl font-bold text-gray-900">
-                {persons.filter(p => p.occupationType === 'WORKER').length || 'N/A'}
+                {(persons || []).filter(p => p.occupationType === 'WORKER').length || 0}
               </p>
             </div>
           </div>
@@ -424,7 +424,7 @@ const UnifiedPeopleManagement = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Members</p>
               <p className="text-2xl font-bold text-gray-900">
-                {persons.filter(p => p.personType === 'MEMBER').length}
+                {(persons || []).filter(p => p.personType === 'MEMBER').length}
               </p>
             </div>
           </div>

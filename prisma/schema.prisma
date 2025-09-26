@@ -47,7 +47,7 @@ model Person {
   phone            String?
   address          String?
   personType       PersonType    @default(VISITOR)
-  occupationType   OccupationType @default(STUDENT)
+  // occupationType   OccupationType @default(STUDENT) // Temporarily commented out until DB migration
   membershipDate   DateTime?
   status           PersonStatus  @default(ACTIVE)
   notes            String?
@@ -61,7 +61,7 @@ model Person {
 
   @@index([status])
   @@index([personType])
-  @@index([occupationType])
+  // @@index([occupationType]) // Temporarily commented out until DB migration
   @@index([createdAt])
   @@map("persons")
 }

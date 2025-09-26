@@ -128,9 +128,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Only add occupationType if it's provided (after database migration)
-    if (occupationType) {
-      personData.occupationType = occupationType
-    }
+    // Temporarily commented out until database migration is complete
+    // if (occupationType) {
+    //   personData.occupationType = occupationType
+    // }
 
     const person = await prisma.person.create({
       data: personData,

@@ -93,9 +93,10 @@ export async function PUT(
     }
 
     // Only update occupationType if it's provided (after database migration)
-    if (occupationType) {
-      updateData.occupationType = occupationType
-    }
+    // Temporarily commented out until database migration is complete
+    // if (occupationType) {
+    //   updateData.occupationType = occupationType
+    // }
 
     const person = await prisma.person.update({
       where: { id: params.id },

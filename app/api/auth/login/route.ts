@@ -8,10 +8,28 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password } = loginSchema.parse(body)
 
-    // Find user by email
-    const user = await prisma.user.findUnique({
+    // Find user by email or username
+    // First try to find by exact email match
+    let user = await prisma.user.findUnique({
       where: { email },
     })
+
+    // If not found and input doesn't look like an email, try to find by username patterns
+    if (!user && !email.includes('@')) {
+      // Try common username patterns
+      const possibleEmails = [
+        `${email}@library.com`,
+        `${email}@gmail.com`,
+        `${email}@email.com`
+      ]
+      
+      for (const possibleEmail of possibleEmails) {
+        user = await prisma.user.findUnique({
+          where: { email: possibleEmail },
+        })
+        if (user) break
+      }
+    }
 
     if (!user) {
       return NextResponse.json(

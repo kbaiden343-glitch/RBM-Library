@@ -20,8 +20,6 @@ import {
   RefreshCw,
   Grid,
   List,
-  GraduationCap,
-  Briefcase,
   BarChart3
 } from 'lucide-react'
 import toast from 'react-hot-toast'
@@ -33,7 +31,6 @@ interface Person {
   phone?: string
   address?: string
   personType: 'MEMBER' | 'VISITOR'
-  occupationType?: 'STUDENT' | 'WORKER' // Optional until database migration
   status: 'ACTIVE' | 'INACTIVE' | 'BANNED' | 'SUSPENDED'
   notes?: string
   emergencyContact?: string
@@ -48,7 +45,6 @@ const UnifiedPeopleManagement = () => {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterPersonType, setFilterPersonType] = useState('all')
-  const [filterOccupationType, setFilterOccupationType] = useState('all')
   const [filterStatus, setFilterStatus] = useState('all')
   const [showAddModal, setShowAddModal] = useState(false)
   const [editingPerson, setEditingPerson] = useState<Person | null>(null)
@@ -62,14 +58,12 @@ const UnifiedPeopleManagement = () => {
     phone: '',
     address: '',
     personType: 'VISITOR' as 'MEMBER' | 'VISITOR',
-    occupationType: 'STUDENT' as 'STUDENT' | 'WORKER',
     status: 'ACTIVE' as 'ACTIVE' | 'INACTIVE' | 'BANNED' | 'SUSPENDED',
     notes: '',
     emergencyContact: ''
   })
 
   const personTypes = ['all', 'MEMBER', 'VISITOR']
-  const occupationTypes = ['all', 'STUDENT', 'WORKER']
   const statuses = ['all', 'ACTIVE', 'INACTIVE', 'BANNED', 'SUSPENDED']
 
   // Load persons on component mount
@@ -114,10 +108,9 @@ const UnifiedPeopleManagement = () => {
                          (person.phone && person.phone.includes(searchTerm))
     
     const matchesPersonType = filterPersonType === 'all' || person.personType === filterPersonType
-    const matchesOccupationType = filterOccupationType === 'all' || person.occupationType === filterOccupationType || !person.occupationType
     const matchesStatus = filterStatus === 'all' || person.status === filterStatus
 
-    return matchesSearch && matchesPersonType && matchesOccupationType && matchesStatus
+    return matchesSearch && matchesPersonType && matchesStatus
   })
 
   const handleAddPerson = async (e: React.FormEvent) => {
@@ -141,7 +134,6 @@ const UnifiedPeopleManagement = () => {
           phone: '',
           address: '',
           personType: 'VISITOR',
-          occupationType: 'STUDENT',
           status: 'ACTIVE',
           notes: '',
           emergencyContact: ''
@@ -232,21 +224,6 @@ const UnifiedPeopleManagement = () => {
     }
   }
 
-  const getOccupationTypeColor = (occupationType: string) => {
-    switch (occupationType) {
-      case 'STUDENT': return 'bg-indigo-100 text-indigo-800'
-      case 'WORKER': return 'bg-orange-100 text-orange-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
-
-  const getOccupationIcon = (occupationType: string) => {
-    switch (occupationType) {
-      case 'STUDENT': return <GraduationCap className="h-4 w-4" />
-      case 'WORKER': return <Briefcase className="h-4 w-4" />
-      default: return <Users className="h-4 w-4" />
-    }
-  }
 
   return (
     <div className="space-y-6">
@@ -318,20 +295,6 @@ const UnifiedPeopleManagement = () => {
             </select>
           </div>
 
-          {/* Occupation Type Filter */}
-          <div>
-            <select
-              value={filterOccupationType}
-              onChange={(e) => setFilterOccupationType(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
-            >
-              {occupationTypes.map(type => (
-                <option key={type} value={type}>
-                  {type === 'all' ? 'All Occupations' : type}
-                </option>
-              ))}
-            </select>
-          </div>
 
           {/* Status Filter */}
           <div>
@@ -450,9 +413,6 @@ const UnifiedPeopleManagement = () => {
                     Type
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Occupation
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -483,14 +443,6 @@ const UnifiedPeopleManagement = () => {
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPersonTypeColor(person.personType)}`}>
                         {person.personType}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {getOccupationIcon(person.occupationType || 'STUDENT')}
-                        <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(person.occupationType || 'STUDENT')}`}>
-                          {person.occupationType || 'N/A'}
-                        </span>
-                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(person.status)}`}>
@@ -578,10 +530,6 @@ const UnifiedPeopleManagement = () => {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getPersonTypeColor(person.personType)}`}>
                       {person.personType}
-                    </span>
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(person.occupationType || 'STUDENT')}`}>
-                      {getOccupationIcon(person.occupationType || 'STUDENT')}
-                      <span className="ml-1">{person.occupationType || 'N/A'}</span>
                     </span>
                     <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(person.status)}`}>
                       {person.status}
@@ -685,20 +633,6 @@ const UnifiedPeopleManagement = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Occupation Type
-                  </label>
-                  <select
-                    value={newPerson.occupationType}
-                    onChange={(e) => setNewPerson({...newPerson, occupationType: e.target.value as 'STUDENT' | 'WORKER'})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
-                  >
-                    <option value="STUDENT">Student</option>
-                    <option value="WORKER">Worker</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Optional - will be available after database migration</p>
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -834,20 +768,6 @@ const UnifiedPeopleManagement = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Occupation Type
-                  </label>
-                  <select
-                    value={editingPerson.occupationType || 'STUDENT'}
-                    onChange={(e) => setEditingPerson({...editingPerson, occupationType: e.target.value as 'STUDENT' | 'WORKER'})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-gray-900 bg-white"
-                  >
-                    <option value="STUDENT">Student</option>
-                    <option value="WORKER">Worker</option>
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">Optional - will be available after database migration</p>
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -949,15 +869,6 @@ const UnifiedPeopleManagement = () => {
                   </span>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Occupation Type</label>
-                  <div className="flex items-center">
-                    {getOccupationIcon(viewingPerson.occupationType)}
-                    <span className={`ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getOccupationTypeColor(viewingPerson.occupationType)}`}>
-                      {viewingPerson.occupationType}
-                    </span>
-                  </div>
-                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Status</label>
@@ -1032,25 +943,6 @@ const UnifiedPeopleManagement = () => {
                       </div>
                     </div>
 
-                    <div className="bg-green-50 p-4 rounded-lg">
-                      <div className="flex items-center">
-                        <GraduationCap className="h-8 w-8 text-green-600" />
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-green-600">Students</p>
-                          <p className="text-2xl font-bold text-green-900">{stats.overview.totalStudents}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-orange-50 p-4 rounded-lg">
-                      <div className="flex items-center">
-                        <Briefcase className="h-8 w-8 text-orange-600" />
-                        <div className="ml-3">
-                          <p className="text-sm font-medium text-orange-600">Workers</p>
-                          <p className="text-2xl font-bold text-orange-900">{stats.overview.totalWorkers}</p>
-                        </div>
-                      </div>
-                    </div>
 
                     <div className="bg-purple-50 p-4 rounded-lg">
                       <div className="flex items-center">

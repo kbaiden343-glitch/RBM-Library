@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
     const status = searchParams.get('status') || ''
-    const memberId = searchParams.get('memberId') || ''
+    const personId = searchParams.get('personId') || ''
     const bookId = searchParams.get('bookId') || ''
 
     const skip = (page - 1) * limit
@@ -20,11 +20,8 @@ export async function GET(request: NextRequest) {
       where.status = status
     }
     
-    if (memberId) {
-      where.OR = [
-        { memberId: memberId },
-        { personId: memberId }
-      ]
+    if (personId) {
+      where.personId = personId
     }
     
     if (bookId) {
@@ -88,68 +85,43 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if person exists and is active (using unified Person model)
-    let person = null
-    let member = null
-    
-    if (borrowingData.personId) {
-      person = await prisma.person.findUnique({
-        where: { id: borrowingData.personId },
-      })
-
-      if (!person) {
-        return NextResponse.json(
-          { error: 'Person not found' },
-          { status: 404 }
-        )
-      }
-
-      if (person.status !== 'ACTIVE') {
-        return NextResponse.json(
-          { error: 'Person is not active' },
-          { status: 400 }
-        )
-      }
-    } else if (borrowingData.memberId) {
-      // Legacy member support
-      member = await prisma.member.findUnique({
-        where: { id: borrowingData.memberId },
-      })
-
-      if (!member) {
-        return NextResponse.json(
-          { error: 'Member not found' },
-          { status: 404 }
-        )
-      }
-
-      if (member.status !== 'ACTIVE') {
-        return NextResponse.json(
-          { error: 'Member is not active' },
-          { status: 400 }
-        )
-      }
-    } else {
+    // Check if person exists and is active
+    if (!borrowingData.personId) {
       return NextResponse.json(
-        { error: 'Person ID or Member ID is required' },
+        { error: 'Person ID is required' },
         { status: 400 }
       )
     }
 
-    // Check if person/member has reached borrowing limit (e.g., 5 books)
+    const person = await prisma.person.findUnique({
+      where: { id: borrowingData.personId },
+    })
+
+    if (!person) {
+      return NextResponse.json(
+        { error: 'Person not found' },
+        { status: 404 }
+      )
+    }
+
+    if (person.status !== 'ACTIVE') {
+      return NextResponse.json(
+        { error: 'Person is not active' },
+        { status: 400 }
+      )
+    }
+
+    // Check if person has reached borrowing limit (e.g., 5 books)
     const activeBorrowings = await prisma.borrowing.count({
       where: {
-        OR: [
-          { personId: borrowingData.personId },
-          { memberId: borrowingData.memberId }
-        ],
+        personId: borrowingData.personId,
         status: 'BORROWED',
       },
     })
 
     if (activeBorrowings >= 5) {
       return NextResponse.json(
-        { error: 'Member has reached maximum borrowing limit' },
+        { error: 'Person has reached maximum borrowing limit' },
         { status: 400 }
       )
     }
@@ -159,7 +131,6 @@ export async function POST(request: NextRequest) {
       data: {
         bookId: borrowingData.bookId,
         personId: borrowingData.personId,
-        memberId: borrowingData.memberId,
         dueDate: new Date(borrowingData.dueDate),
       },
       include: {

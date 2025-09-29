@@ -66,27 +66,10 @@ model Person {
   @@map("persons")
 }
 
-model Member {
-  id             String        @id @default(cuid())
-  name           String
-  email          String        @unique
-  phone          String
-  address        String
-  membershipDate DateTime      @default(now())
-  status         MemberStatus  @default(ACTIVE)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  attendance     Attendance[]
-  borrowings     Borrowing[]
-  reservations   Reservation[]
-
-  @@map("members")
-}
 
 model Borrowing {
   id         String          @id @default(cuid())
   bookId     String
-  memberId   String?
   borrowDate DateTime        @default(now())
   dueDate    DateTime
   returnDate DateTime?
@@ -95,12 +78,10 @@ model Borrowing {
   updatedAt  DateTime        @updatedAt
   personId   String?
   book       Book            @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  member     Member?         @relation(fields: [memberId], references: [id], onDelete: Cascade)
   person     Person?         @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([personId])
-  @@index([memberId])
   @@index([createdAt])
   @@map("borrowings")
 }
@@ -108,26 +89,22 @@ model Borrowing {
 model Reservation {
   id              String            @id @default(cuid())
   bookId          String
-  memberId        String?
   reservationDate DateTime          @default(now())
   status          ReservationStatus @default(WAITING)
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   personId        String?
   book            Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
-  member          Member?           @relation(fields: [memberId], references: [id], onDelete: Cascade)
   person          Person?           @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@index([status])
   @@index([personId])
-  @@index([memberId])
   @@index([createdAt])
   @@map("reservations")
 }
 
 model Attendance {
   id           String    @id @default(cuid())
-  memberId     String?
   checkInTime  DateTime  @default(now())
   createdAt    DateTime  @default(now())
   checkOutTime DateTime?
@@ -137,11 +114,9 @@ model Attendance {
   visitorName  String?
   visitorPhone String?
   personId     String?
-  member       Member?   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   person       Person?   @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@index([personId])
-  @@index([memberId])
   @@index([checkInTime])
   @@index([isVisitor])
   @@map("attendance")
@@ -176,10 +151,6 @@ enum PersonStatus {
   SUSPENDED
 }
 
-enum MemberStatus {
-  ACTIVE
-  INACTIVE
-}
 
 enum BorrowingStatus {
   BORROWED

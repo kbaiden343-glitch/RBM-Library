@@ -17,18 +17,6 @@ interface Book {
   updatedAt?: string
 }
 
-interface Member {
-  id: string
-  name: string
-  email: string
-  phone: string
-  address: string
-  membershipDate: string
-  status: 'ACTIVE' | 'INACTIVE'
-  personType?: 'MEMBER' | 'VISITOR' | 'STUDENT' | 'VIP' | 'STAFF' // Include person type
-  createdAt?: string
-  updatedAt?: string
-}
 
 interface Person {
   id: string
@@ -50,7 +38,6 @@ interface Borrowing {
   id: string
   bookId: string
   personId?: string
-  memberId?: string // Keep for backward compatibility
   borrowDate: string
   dueDate: string
   returnDate?: string
@@ -59,32 +46,27 @@ interface Borrowing {
   updatedAt?: string
   book?: Book
   person?: Person
-  member?: Member // Keep for backward compatibility
 }
 
 interface Reservation {
   id: string
   bookId: string
   personId?: string
-  memberId?: string // Keep for backward compatibility
   reservationDate: string
   status: 'WAITING' | 'READY' | 'CANCELLED'
   createdAt?: string
   updatedAt?: string
   book?: Book
   person?: Person
-  member?: Member // Keep for backward compatibility
 }
 
 interface Attendance {
   id: string
   personId?: string
-  memberId?: string // Keep for backward compatibility
   checkInTime: string
   checkOutTime?: string
   createdAt?: string
   person?: Person
-  member?: Member // Keep for backward compatibility
   visitorName?: string
   visitorEmail?: string
   visitorPhone?: string

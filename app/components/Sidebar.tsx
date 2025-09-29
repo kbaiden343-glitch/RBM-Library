@@ -13,8 +13,7 @@ import {
   Shield,
   UserCheck,
   UserPlus,
-  TrendingUp,
-  Library
+  TrendingUp
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -33,7 +32,6 @@ const Sidebar = ({ activePage, setActivePage, onClose }: SidebarProps) => {
     { key: 'people', icon: Users, label: 'People Management', permission: 'members:read' },
     { key: 'borrowing', icon: BookMarked, label: 'Borrowing System', permission: 'borrowing:read' },
     { key: 'attendance', icon: UserCheck, label: 'Attendance (Unified)', permission: 'manage_attendance' },
-    { key: 'library-stats', icon: Library, label: 'Library Stats', permission: 'reports:read' },
     { key: 'users', icon: Shield, label: 'User Management', permission: 'all' },
     { key: 'reports', icon: BarChart3, label: 'Reports & Analytics', permission: 'reports:read' },
     { key: 'settings', icon: Settings, label: 'Settings', permission: 'settings:read' },
@@ -119,30 +117,6 @@ const Sidebar = ({ activePage, setActivePage, onClose }: SidebarProps) => {
           </div>
         )}
 
-        {/* Library Stats */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
-            Library Stats
-          </h3>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Total Books:</span>
-              <span className="font-medium text-gray-900">1,247</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Members:</span>
-              <span className="font-medium text-gray-900">342</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Borrowed:</span>
-              <span className="font-medium text-red-600">89</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Available:</span>
-              <span className="font-medium text-green-600">1,158</span>
-            </div>
-          </div>
-        </div>
       </div>
     </aside>
   )

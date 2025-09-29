@@ -16,7 +16,6 @@ import UnifiedAttendance from './pages/UnifiedAttendance'
 import AttendanceTracking from './pages/AttendanceTracking'
 import UserManagement from './pages/UserManagement'
 import Reports from './pages/Reports'
-import LibraryStats from './pages/LibraryStats'
 import Settings from './pages/Settings'
 
 export default function Home() {
@@ -81,8 +80,6 @@ export default function Home() {
         return <UserManagement />
       case 'reports':
         return <Reports />
-      case 'library-stats':
-        return <LibraryStats />
       case 'settings':
         return <Settings />
       default:

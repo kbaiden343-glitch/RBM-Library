@@ -38,7 +38,7 @@ interface Person {
   address?: string
   personType: 'MEMBER' | 'VISITOR' | 'STUDENT' | 'VIP' | 'STAFF'
   membershipDate?: string
-  status: 'ACTIVE' | 'INACTIVE'
+  status: 'ACTIVE' | 'INACTIVE' | 'BANNED' | 'SUSPENDED'
   notes?: string
   emergencyContact?: string
   libraryId?: string
@@ -92,7 +92,7 @@ interface Attendance {
 
 interface LibraryState {
   books: Book[]
-  members: Member[]
+  members: Person[]
   borrowings: Borrowing[]
   reservations: Reservation[]
   attendance: Attendance[]
@@ -108,9 +108,9 @@ type LibraryAction =
   | { type: 'ADD_BOOK'; payload: Book }
   | { type: 'UPDATE_BOOK'; payload: Book }
   | { type: 'DELETE_BOOK'; payload: string }
-  | { type: 'SET_MEMBERS'; payload: Member[] }
-  | { type: 'ADD_MEMBER'; payload: Member }
-  | { type: 'UPDATE_MEMBER'; payload: Member }
+  | { type: 'SET_MEMBERS'; payload: Person[] }
+  | { type: 'ADD_MEMBER'; payload: Person }
+  | { type: 'UPDATE_MEMBER'; payload: Person }
   | { type: 'DELETE_MEMBER'; payload: string }
   | { type: 'SET_BORROWINGS'; payload: Borrowing[] }
   | { type: 'ADD_BORROWING'; payload: Borrowing }
@@ -127,8 +127,8 @@ const LibraryContext = createContext<{
   addBook: (book: Omit<Book, 'id'>) => Promise<void>
   updateBook: (book: Book) => Promise<void>
   deleteBook: (bookId: string) => Promise<void>
-  addMember: (member: Omit<Member, 'id'>) => Promise<void>
-  updateMember: (member: Member) => Promise<void>
+  addMember: (member: Omit<Person, 'id'>) => Promise<void>
+  updateMember: (member: Person) => Promise<void>
   deleteMember: (memberId: string) => Promise<void>
   borrowBook: (borrowing: Omit<Borrowing, 'id' | 'borrowDate' | 'status'>) => Promise<void>
   returnBook: (borrowingId: string) => Promise<void>
@@ -407,7 +407,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
       }
     },
     // Member operations
-    addMember: async (member: Omit<Member, 'id'>) => {
+    addMember: async (member: Omit<Person, 'id'>) => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true })
         // Use the new persons API to create a member
@@ -417,25 +417,14 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
           phone: member.phone,
           address: member.address,
           personType: member.personType || 'MEMBER',
-          status: 'ACTIVE',
+          status: member.status || 'ACTIVE',
         }
         const newPerson = await apiCall('/api/persons', {
           method: 'POST',
           body: JSON.stringify(personData),
         })
-        // Convert person to member format
-        const newMember = {
-          id: newPerson.id,
-          name: newPerson.name,
-          email: newPerson.email,
-          phone: newPerson.phone || '',
-          address: newPerson.address || '',
-          membershipDate: newPerson.membershipDate || newPerson.createdAt,
-          status: (newPerson.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
-          createdAt: newPerson.createdAt,
-          updatedAt: newPerson.updatedAt,
-        }
-        dispatch({ type: 'ADD_MEMBER', payload: newMember })
+        // Use the person directly (no conversion needed)
+        dispatch({ type: 'ADD_MEMBER', payload: newPerson })
         toast.success('Member added successfully!')
       } catch (error: any) {
         console.error('Error adding member:', error)
@@ -448,18 +437,20 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         dispatch({ type: 'SET_LOADING', payload: false })
       }
     },
-    updateMember: async (member: Member) => {
+    updateMember: async (member: Person) => {
       try {
         dispatch({ type: 'SET_LOADING', payload: true })
         
-        // Convert Member to Person format for the API
+        // Use the person data directly for the API
         const personData = {
           name: member.name,
           email: member.email,
           phone: member.phone,
           address: member.address,
-          personType: 'MEMBER',
-          status: member.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE',
+          personType: member.personType,
+          status: member.status,
+          notes: member.notes,
+          emergencyContact: member.emergencyContact,
         }
         
         const updatedPerson = await apiCall(`/api/persons/${member.id}`, {
@@ -467,20 +458,8 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
           body: JSON.stringify(personData),
         })
         
-        // Convert back to Member format
-        const updatedMember = {
-          id: updatedPerson.id,
-          name: updatedPerson.name,
-          email: updatedPerson.email,
-          phone: updatedPerson.phone || '',
-          address: updatedPerson.address || '',
-          membershipDate: updatedPerson.membershipDate || updatedPerson.createdAt,
-          status: (updatedPerson.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE') as 'ACTIVE' | 'INACTIVE',
-          createdAt: updatedPerson.createdAt,
-          updatedAt: updatedPerson.updatedAt,
-        }
-        
-        dispatch({ type: 'UPDATE_MEMBER', payload: updatedMember })
+        // Use the person directly (no conversion needed)
+        dispatch({ type: 'UPDATE_MEMBER', payload: updatedPerson })
         toast.success('Member updated successfully!')
       } catch (error) {
         console.error('Error updating member:', error)

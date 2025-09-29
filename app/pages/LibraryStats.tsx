@@ -28,7 +28,6 @@ import {
   Pause,
   Library,
   UserPlus,
-  BookMarked,
   CalendarDays,
   TrendingDown
 } from 'lucide-react'
@@ -218,20 +217,20 @@ const LibraryStats = () => {
       // Calculate reservation statistics
       const totalReservations = reservations.length
       const pendingReservations = reservations.filter(r => r.status === 'WAITING').length
-      const fulfilledReservations = reservations.filter(r => r.status === 'FULFILLED').length
+      const readyReservations = reservations.filter(r => r.status === 'READY').length
       const cancelledReservations = reservations.filter(r => r.status === 'CANCELLED').length
 
-      // Calculate average wait time for reservations
-      const fulfilledWithDates = reservations.filter(r => 
-        r.status === 'FULFILLED' && r.createdAt && r.fulfilledAt
+      // Calculate average wait time for reservations (using READY status as fulfilled)
+      const readyWithDates = reservations.filter(r => 
+        r.status === 'READY' && r.createdAt
       )
-      const averageWaitTime = fulfilledWithDates.length > 0
-        ? fulfilledWithDates.reduce((sum, r) => {
+      const averageWaitTime = readyWithDates.length > 0
+        ? readyWithDates.reduce((sum, r) => {
             const createdDate = new Date(r.createdAt!)
-            const fulfilledDate = new Date(r.fulfilledAt!)
-            const diffDays = Math.ceil((fulfilledDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
+            const readyDate = new Date(r.updatedAt) // Use updatedAt as when it became ready
+            const diffDays = Math.ceil((readyDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24))
             return sum + diffDays
-          }, 0) / fulfilledWithDates.length
+          }, 0) / readyWithDates.length
         : 0
 
       // Calculate performance metrics
@@ -279,7 +278,7 @@ const LibraryStats = () => {
         reservations: {
           total: totalReservations,
           pending: pendingReservations,
-          fulfilled: fulfilledReservations,
+          fulfilled: readyReservations,
           cancelled: cancelledReservations,
           averageWaitTime: Math.round(averageWaitTime * 10) / 10
         },

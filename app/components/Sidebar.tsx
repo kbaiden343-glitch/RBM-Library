@@ -12,7 +12,9 @@ import {
   Star,
   Shield,
   UserCheck,
-  UserPlus
+  UserPlus,
+  TrendingUp,
+  Library
 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
@@ -31,6 +33,7 @@ const Sidebar = ({ activePage, setActivePage, onClose }: SidebarProps) => {
     { key: 'people', icon: Users, label: 'People Management', permission: 'members:read' },
     { key: 'borrowing', icon: BookMarked, label: 'Borrowing System', permission: 'borrowing:read' },
     { key: 'attendance', icon: UserCheck, label: 'Attendance (Unified)', permission: 'manage_attendance' },
+    { key: 'library-stats', icon: Library, label: 'Library Stats', permission: 'reports:read' },
     { key: 'users', icon: Shield, label: 'User Management', permission: 'all' },
     { key: 'reports', icon: BarChart3, label: 'Reports & Analytics', permission: 'reports:read' },
     { key: 'settings', icon: Settings, label: 'Settings', permission: 'settings:read' },

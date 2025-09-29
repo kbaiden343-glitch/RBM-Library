@@ -4,10 +4,10 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-// Configure database URL with connection pool parameters
+// Configure database URL with connection pool parameters for Vercel
 const databaseUrl = process.env.DATABASE_URL
 const optimizedDatabaseUrl = databaseUrl ? 
-  `${databaseUrl}?connection_limit=5&pool_timeout=20&connect_timeout=60` : 
+  `${databaseUrl}?connection_limit=1&pool_timeout=20&connect_timeout=60&schema=public` : 
   databaseUrl
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({

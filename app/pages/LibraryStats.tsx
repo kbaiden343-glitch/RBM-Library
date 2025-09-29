@@ -28,7 +28,7 @@ import {
   Pause,
   Library,
   UserPlus,
-  BookCheck,
+  BookMarked,
   CalendarDays,
   TrendingDown
 } from 'lucide-react'
@@ -469,7 +469,7 @@ const LibraryStats = () => {
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center">
             <div className="p-2 bg-purple-100 rounded-lg">
-              <BookCheck className="h-6 w-6 text-purple-600" />
+              <BookMarked className="h-6 w-6 text-purple-600" />
             </div>
             <div className="ml-3">
               <p className="text-sm font-medium text-gray-600">Return Rate</p>

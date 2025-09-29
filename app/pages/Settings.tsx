@@ -19,6 +19,7 @@ import {
   RefreshCw
 } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useNotifications } from '../context/NotificationContext'
 
 interface SettingsData {
   id?: string
@@ -32,8 +33,26 @@ interface SettingsData {
   notifications: {
     email: boolean
     sms: boolean
+    push: boolean
     overdue: boolean
     reservations: boolean
+    newBooks: boolean
+    systemUpdates: boolean
+    borrowingReminders: boolean
+    returnReminders: boolean
+    overdueAlerts: boolean
+    frequency: 'immediate' | 'daily' | 'weekly'
+    quietHours: {
+      enabled: boolean
+      start: string
+      end: string
+    }
+    emailSettings: {
+      overdueReminders: boolean
+      weeklyDigest: boolean
+      systemAlerts: boolean
+      marketingEmails: boolean
+    }
   }
   theme: string
   language: string
@@ -46,6 +65,7 @@ interface SecurityForm {
 }
 
 const Settings = () => {
+  const { addNotification } = useNotifications()
   const [activeTab, setActiveTab] = useState('general')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -66,8 +86,26 @@ const Settings = () => {
     notifications: {
       email: true,
       sms: false,
+      push: true,
       overdue: true,
-      reservations: true
+      reservations: true,
+      newBooks: true,
+      systemUpdates: true,
+      borrowingReminders: true,
+      returnReminders: true,
+      overdueAlerts: true,
+      frequency: 'immediate',
+      quietHours: {
+        enabled: false,
+        start: '22:00',
+        end: '08:00'
+      },
+      emailSettings: {
+        overdueReminders: true,
+        weeklyDigest: false,
+        systemAlerts: true,
+        marketingEmails: false
+      }
     },
     theme: 'light',
     language: 'en'
@@ -411,26 +449,42 @@ const Settings = () => {
     </div>
   )
 
+  const handleTestNotification = () => {
+    addNotification({
+      type: 'info',
+      title: 'Test Notification',
+      message: 'This is a test notification to verify your notification settings are working correctly.',
+      action: {
+        label: 'Got it',
+        onClick: () => console.log('Test notification acknowledged')
+      }
+    })
+    toast.success('Test notification sent!')
+  }
+
   const renderNotificationSettings = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* General Notification Settings */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Preferences</h3>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">General Notifications</h3>
         <div className="space-y-4">
           {[
-            { key: 'email', label: 'Email Notifications', description: 'Receive notifications via email' },
-            { key: 'sms', label: 'SMS Notifications', description: 'Receive notifications via SMS' },
-            { key: 'overdue', label: 'Overdue Alerts', description: 'Get notified about overdue books' },
-            { key: 'reservations', label: 'Reservation Alerts', description: 'Get notified about reservations' }
+            { key: 'email', label: 'Email Notifications', description: 'Receive notifications via email', icon: '📧' },
+            { key: 'sms', label: 'SMS Notifications', description: 'Receive notifications via text message', icon: '📱' },
+            { key: 'push', label: 'Push Notifications', description: 'Receive browser push notifications', icon: '🔔' }
           ].map((notification) => (
-            <div key={notification.key} className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-900">{notification.label}</p>
-                <p className="text-sm text-gray-500">{notification.description}</p>
+            <div key={notification.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">{notification.icon}</span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{notification.label}</p>
+                  <p className="text-sm text-gray-500">{notification.description}</p>
+                </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={settings.notifications[notification.key as keyof typeof settings.notifications]}
+                  checked={settings.notifications[notification.key as keyof typeof settings.notifications] as boolean}
                   onChange={(e) => handleSettingChange(`notifications.${notification.key}`, e.target.checked)}
                   className="sr-only peer"
                 />
@@ -438,6 +492,189 @@ const Settings = () => {
               </label>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Library Activity Notifications */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Library Activity</h3>
+        <div className="space-y-4">
+          {[
+            { key: 'overdue', label: 'Overdue Books', description: 'Get notified when books become overdue', icon: '📚' },
+            { key: 'reservations', label: 'Reservations', description: 'Get notified about new reservations', icon: '📋' },
+            { key: 'newBooks', label: 'New Books', description: 'Get notified when new books are added', icon: '🆕' },
+            { key: 'systemUpdates', label: 'System Updates', description: 'Get notified about system maintenance', icon: '⚙️' }
+          ].map((notification) => (
+            <div key={notification.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">{notification.icon}</span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{notification.label}</p>
+                  <p className="text-sm text-gray-500">{notification.description}</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.notifications[notification.key as keyof typeof settings.notifications] as boolean}
+                  onChange={(e) => handleSettingChange(`notifications.${notification.key}`, e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Reminder Settings */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Reminder Settings</h3>
+        <div className="space-y-4">
+          {[
+            { key: 'borrowingReminders', label: 'Borrowing Reminders', description: 'Get reminded before borrowing period ends', icon: '⏰' },
+            { key: 'returnReminders', label: 'Return Reminders', description: 'Get reminded to return books', icon: '📅' },
+            { key: 'overdueAlerts', label: 'Overdue Alerts', description: 'Get alerts for overdue books', icon: '🚨' }
+          ].map((notification) => (
+            <div key={notification.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">{notification.icon}</span>
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{notification.label}</p>
+                  <p className="text-sm text-gray-500">{notification.description}</p>
+                </div>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.notifications[notification.key as keyof typeof settings.notifications] as boolean}
+                  onChange={(e) => handleSettingChange(`notifications.${notification.key}`, e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Notification Frequency */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Notification Frequency</h3>
+        <div className="p-4 border border-gray-200 rounded-lg">
+          <div className="space-y-3">
+            {[
+              { value: 'immediate', label: 'Immediate', description: 'Get notifications as soon as they occur' },
+              { value: 'daily', label: 'Daily Digest', description: 'Receive a daily summary of notifications' },
+              { value: 'weekly', label: 'Weekly Digest', description: 'Receive a weekly summary of notifications' }
+            ].map((option) => (
+              <label key={option.value} className="flex items-center space-x-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="frequency"
+                  value={option.value}
+                  checked={settings.notifications.frequency === option.value}
+                  onChange={(e) => handleSettingChange('notifications.frequency', e.target.value)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{option.label}</p>
+                  <p className="text-sm text-gray-500">{option.description}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Quiet Hours */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Quiet Hours</h3>
+        <div className="p-4 border border-gray-200 rounded-lg space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-900">Enable Quiet Hours</p>
+              <p className="text-sm text-gray-500">Pause notifications during specified hours</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={settings.notifications.quietHours.enabled}
+                onChange={(e) => handleSettingChange('notifications.quietHours.enabled', e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
+          </div>
+          
+          {settings.notifications.quietHours.enabled && (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                <input
+                  type="time"
+                  value={settings.notifications.quietHours.start}
+                  onChange={(e) => handleSettingChange('notifications.quietHours.start', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                <input
+                  type="time"
+                  value={settings.notifications.quietHours.end}
+                  onChange={(e) => handleSettingChange('notifications.quietHours.end', e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Email Settings */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Email Preferences</h3>
+        <div className="space-y-4">
+          {[
+            { key: 'overdueReminders', label: 'Overdue Reminders', description: 'Email reminders for overdue books' },
+            { key: 'weeklyDigest', label: 'Weekly Digest', description: 'Weekly summary of library activity' },
+            { key: 'systemAlerts', label: 'System Alerts', description: 'Important system notifications' },
+            { key: 'marketingEmails', label: 'Marketing Emails', description: 'News and promotional content' }
+          ].map((setting) => (
+            <div key={setting.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+              <div>
+                <p className="text-sm font-medium text-gray-900">{setting.label}</p>
+                <p className="text-sm text-gray-500">{setting.description}</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={settings.notifications.emailSettings[setting.key as keyof typeof settings.notifications.emailSettings]}
+                  onChange={(e) => handleSettingChange(`notifications.emailSettings.${setting.key}`, e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Test Notifications */}
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Test Notifications</h3>
+        <div className="p-4 border border-gray-200 rounded-lg">
+          <p className="text-sm text-gray-600 mb-4">
+            Test your notification settings to ensure they're working correctly.
+          </p>
+          <button
+            onClick={handleTestNotification}
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <Bell className="h-4 w-4 mr-2" />
+            Send Test Notification
+          </button>
         </div>
       </div>
     </div>

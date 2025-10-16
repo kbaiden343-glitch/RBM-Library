@@ -3,7 +3,7 @@
 ## 🚨 If Your Data Isn't Persisting on Vercel
 
 ### Step 1: Check Vercel Dashboard (2 minutes)
-
+d
 1. Go to [vercel.com/dashboard](https://vercel.com/dashboard)
 2. Click your library project
 3. Go to **Settings** → **Environment Variables**

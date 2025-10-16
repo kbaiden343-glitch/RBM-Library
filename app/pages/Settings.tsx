@@ -19,7 +19,8 @@ import {
   RefreshCw
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { useNotifications } from '../context/NotificationContext'
+import NotificationDashboard from '../components/NotificationDashboard'
+import { useNotifications } from '../hooks/useNotifications'
 
 interface SettingsData {
   id?: string
@@ -65,7 +66,6 @@ interface SecurityForm {
 }
 
 const Settings = () => {
-  const { addNotification } = useNotifications()
   const [activeTab, setActiveTab] = useState('general')
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -74,6 +74,8 @@ const Settings = () => {
     new: false,
     confirm: false
   })
+  
+  const { testEmailNotification, testSMSNotification, testPushNotification, requestNotificationPermission } = useNotifications()
   
   const [settings, setSettings] = useState<SettingsData>({
     libraryName: 'Robert Aboagye Mensah Community Library',
@@ -130,6 +132,7 @@ const Settings = () => {
   useEffect(() => {
     loadSettings()
   }, [])
+
 
   // Apply theme changes immediately
   useEffect(() => {
@@ -449,19 +452,6 @@ const Settings = () => {
     </div>
   )
 
-  const handleTestNotification = () => {
-    addNotification({
-      type: 'info',
-      title: 'Test Notification',
-      message: 'This is a test notification to verify your notification settings are working correctly.',
-      action: {
-        label: 'Got it',
-        onClick: () => console.log('Test notification acknowledged')
-      }
-    })
-    toast.success('Test notification sent!')
-  }
-
   const renderNotificationSettings = () => (
     <div className="space-y-8">
       {/* General Notification Settings */}
@@ -481,15 +471,31 @@ const Settings = () => {
                   <p className="text-sm text-gray-500">{notification.description}</p>
                 </div>
               </div>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={settings.notifications[notification.key as keyof typeof settings.notifications] as boolean}
-                  onChange={(e) => handleSettingChange(`notifications.${notification.key}`, e.target.checked)}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-              </label>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => {
+                    if (notification.key === 'email') testEmailNotification()
+                    else if (notification.key === 'sms') testSMSNotification()
+                    else if (notification.key === 'push') {
+                      requestNotificationPermission().then(() => {
+                        testPushNotification()
+                      })
+                    }
+                  }}
+                  className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
+                >
+                  Test
+                </button>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={settings.notifications?.[notification.key as keyof typeof settings.notifications] as boolean || false}
+                    onChange={(e) => handleSettingChange(`notifications.${notification.key}`, e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
             </div>
           ))}
         </div>
@@ -599,7 +605,7 @@ const Settings = () => {
             <label className="relative inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
-                checked={settings.notifications.quietHours.enabled}
+                checked={settings.notifications?.quietHours?.enabled || false}
                 onChange={(e) => handleSettingChange('notifications.quietHours.enabled', e.target.checked)}
                 className="sr-only peer"
               />
@@ -607,13 +613,13 @@ const Settings = () => {
             </label>
           </div>
           
-          {settings.notifications.quietHours.enabled && (
+          {settings.notifications?.quietHours?.enabled && (
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
                 <input
                   type="time"
-                  value={settings.notifications.quietHours.start}
+                  value={settings.notifications?.quietHours?.start || '22:00'}
                   onChange={(e) => handleSettingChange('notifications.quietHours.start', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
                 />
@@ -622,7 +628,7 @@ const Settings = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
                 <input
                   type="time"
-                  value={settings.notifications.quietHours.end}
+                  value={settings.notifications?.quietHours?.end || '08:00'}
                   onChange={(e) => handleSettingChange('notifications.quietHours.end', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
                 />
@@ -650,7 +656,7 @@ const Settings = () => {
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={settings.notifications.emailSettings[setting.key as keyof typeof settings.notifications.emailSettings]}
+                  checked={settings.notifications?.emailSettings?.[setting.key as keyof typeof settings.notifications.emailSettings] || false}
                   onChange={(e) => handleSettingChange(`notifications.emailSettings.${setting.key}`, e.target.checked)}
                   className="sr-only peer"
                 />
@@ -867,7 +873,7 @@ const Settings = () => {
       case 'borrowing':
         return renderBorrowingSettings()
       case 'notifications':
-        return renderNotificationSettings()
+        return <NotificationDashboard />
       case 'security':
         return renderSecuritySettings()
       case 'backup':

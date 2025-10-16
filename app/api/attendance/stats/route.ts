@@ -85,13 +85,10 @@ export async function GET(request: NextRequest) {
 
     // Get top visitors
     const topVisitors = await prisma.attendance.groupBy({
-      by: ['personId', 'memberId'],
+      by: ['personId'],
       where: {
         checkInTime: dateRange,
-        OR: [
-          { personId: { not: null } },
-          { memberId: { not: null } }
-        ]
+        personId: { not: null }
       },
       _count: {
         id: true
@@ -108,30 +105,20 @@ export async function GET(request: NextRequest) {
     const visitorIds = topVisitors
       .filter(v => v.personId)
       .map(v => v.personId!)
-    const memberIds = topVisitors
-      .filter(v => v.memberId)
-      .map(v => v.memberId!)
 
-    const [persons, members] = await Promise.all([
-      visitorIds.length > 0 ? prisma.person.findMany({
-        where: { id: { in: visitorIds } },
-        select: { id: true, name: true, email: true, personType: true }
-      }) : [],
-      memberIds.length > 0 ? prisma.member.findMany({
-        where: { id: { in: memberIds } },
-        select: { id: true, name: true, email: true }
-      }) : []
-    ])
+    const persons = visitorIds.length > 0 ? await prisma.person.findMany({
+      where: { id: { in: visitorIds } },
+      select: { id: true, name: true, email: true, personType: true }
+    }) : []
 
     const topVisitorsWithDetails = topVisitors.map(visitor => {
       const person = persons.find(p => p.id === visitor.personId)
-      const member = members.find(m => m.id === visitor.memberId)
       
       return {
-        id: visitor.personId || visitor.memberId,
-        name: person?.name || member?.name || 'Unknown',
-        email: person?.email || member?.email || 'Unknown',
-        type: person?.personType || 'Member',
+        id: visitor.personId,
+        name: person?.name || 'Unknown',
+        email: person?.email || 'Unknown',
+        type: person?.personType || 'Visitor',
         visits: visitor._count.id
       }
     })

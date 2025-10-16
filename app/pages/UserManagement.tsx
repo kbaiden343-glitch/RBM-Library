@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Users, Search, Plus, Edit, Trash2, Shield, Key, UserCheck, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import toast from 'react-hot-toast'
+import apiClient from '../lib/apiClient'
 
 interface User {
   id: string
@@ -45,18 +46,18 @@ const UserManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/users?role=${filterRole}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setUsers(data.users || [])
+      
+      if (!apiClient.isAuthenticated()) {
+        toast.error('Please log in to view users')
+        return
+      }
+      
+      const response = await apiClient.get(`/api/users?role=${filterRole}`)
+      
+      if (response.error) {
+        toast.error(response.error)
       } else {
-        toast.error('Failed to fetch users')
+        setUsers(response.data?.users || [])
       }
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -68,24 +69,14 @@ const UserManagement = () => {
 
   const handleAddUser = async (userData: any) => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(userData),
-      })
-
-      if (response.ok) {
-        const newUser = await response.json()
-        setUsers([newUser, ...users])
+      const response = await apiClient.post('/api/users', userData)
+      
+      if (response.error) {
+        toast.error(response.error)
+      } else {
+        setUsers([response.data, ...users])
         setShowAddModal(false)
         toast.success('User created successfully!')
-      } else {
-        const error = await response.json()
-        toast.error(error.error || 'Failed to create user')
       }
     } catch (error) {
       console.error('Error creating user:', error)
@@ -97,24 +88,14 @@ const UserManagement = () => {
     if (!editingUser) return
 
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/users/${editingUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(userData),
-      })
-
-      if (response.ok) {
-        const updatedUser = await response.json()
-        setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u))
+      const response = await apiClient.put(`/api/users/${editingUser.id}`, userData)
+      
+      if (response.error) {
+        toast.error(response.error)
+      } else {
+        setUsers(users.map(u => u.id === response.data.id ? response.data : u))
         setEditingUser(null)
         toast.success('User updated successfully!')
-      } else {
-        const error = await response.json()
-        toast.error(error.error || 'Failed to update user')
       }
     } catch (error) {
       console.error('Error updating user:', error)
@@ -128,20 +109,13 @@ const UserManagement = () => {
     }
 
     try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      })
-
-      if (response.ok) {
+      const response = await apiClient.delete(`/api/users/${userId}`)
+      
+      if (response.error) {
+        toast.error(response.error)
+      } else {
         setUsers(users.filter(u => u.id !== userId))
         toast.success('User deleted successfully!')
-      } else {
-        const error = await response.json()
-        toast.error(error.error || 'Failed to delete user')
       }
     } catch (error) {
       console.error('Error deleting user:', error)

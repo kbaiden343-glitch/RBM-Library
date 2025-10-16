@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import toast from 'react-hot-toast'
+import apiClient from '../lib/apiClient'
 
 interface User {
   id: string
@@ -117,8 +118,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedUser && token) {
       try {
         const user = JSON.parse(savedUser)
-        dispatch({ type: 'LOGIN_SUCCESS', payload: user })
+        // Verify token is still valid by checking if it has required fields
+        if (user.id && user.email && user.role) {
+          dispatch({ type: 'LOGIN_SUCCESS', payload: user })
+        } else {
+          // Invalid user data, clear storage
+          localStorage.removeItem('library_user')
+          localStorage.removeItem('token')
+        }
       } catch (error) {
+        console.error('Error parsing saved user:', error)
         localStorage.removeItem('library_user')
         localStorage.removeItem('token')
       }
@@ -129,29 +138,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch({ type: 'LOGIN_START' })
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      })
+      const response = await apiClient.post('/api/auth/login', { email, password })
 
-      const data = await response.json()
-
-      if (response.ok) {
+      if (response.error) {
+        dispatch({ type: 'LOGIN_FAILURE', payload: response.error })
+        toast.error(response.error)
+      } else {
         const user = {
-          ...data.user,
-          permissions: getPermissions(data.user.role)
+          ...response.data.user,
+          permissions: getPermissions(response.data.user.role)
         }
         
         dispatch({ type: 'LOGIN_SUCCESS', payload: user })
         localStorage.setItem('library_user', JSON.stringify(user))
-        localStorage.setItem('token', data.token)
+        localStorage.setItem('token', response.data.token)
         toast.success(`Welcome back, ${user.name}!`)
-      } else {
-        dispatch({ type: 'LOGIN_FAILURE', payload: data.error || 'Login failed' })
-        toast.error(data.error || 'Login failed')
       }
     } catch (error) {
       dispatch({ type: 'LOGIN_FAILURE', payload: 'Login failed. Please try again.' })
@@ -163,29 +164,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch({ type: 'LOGIN_START' })
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password, role }),
-      })
+      const response = await apiClient.post('/api/auth/register', { name, email, password, role })
 
-      const data = await response.json()
-
-      if (response.ok) {
+      if (response.error) {
+        dispatch({ type: 'LOGIN_FAILURE', payload: response.error })
+        toast.error(response.error)
+      } else {
         const user = {
-          ...data.user,
-          permissions: getPermissions(data.user.role)
+          ...response.data.user,
+          permissions: getPermissions(response.data.user.role)
         }
         
         dispatch({ type: 'LOGIN_SUCCESS', payload: user })
         localStorage.setItem('library_user', JSON.stringify(user))
-        localStorage.setItem('token', data.token)
+        localStorage.setItem('token', response.data.token)
         toast.success(`Welcome, ${user.name}!`)
-      } else {
-        dispatch({ type: 'LOGIN_FAILURE', payload: data.error || 'Registration failed' })
-        toast.error(data.error || 'Registration failed')
       }
     } catch (error) {
       dispatch({ type: 'LOGIN_FAILURE', payload: 'Registration failed. Please try again.' })

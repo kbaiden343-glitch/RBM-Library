@@ -18,7 +18,7 @@
     "db:test": "node scripts/test-db.js",
     "db:studio": "prisma studio",
     "db:init": "node scripts/initialize-db.js",
-    "vercel-build": "prisma generate && prisma migrate deploy && node scripts/initialize-db.js && next build"
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@prisma/client": "^6.16.1",

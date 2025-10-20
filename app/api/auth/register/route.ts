@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../../lib/db'
+import { prisma } from '../../../lib/db'
 import { registerSchema } from '../../../../lib/validations'
 import { hashPassword, generateToken, createAuthResponse } from '../../../../lib/auth'
 

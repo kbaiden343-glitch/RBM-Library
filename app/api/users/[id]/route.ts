@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../../lib/db'
+import { prisma } from '../../../lib/db'
 import { verifyToken } from '../../../../lib/auth'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'

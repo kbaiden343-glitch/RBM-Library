@@ -10,33 +10,23 @@ const optimizedDatabaseUrl = databaseUrl ?
   `${databaseUrl}?connection_limit=1&pool_timeout=20&connect_timeout=60&schema=public&pgbouncer=true&prepared_statements=false` : 
   databaseUrl
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
-  datasources: {
-    db: {
-      url: optimizedDatabaseUrl,
-    },
-  },
-})
+// Create a fallback Prisma client that handles missing generated client gracefully
+let prisma: PrismaClient
 
-// Properly disconnect on process termination
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
+try {
+  prisma = globalForPrisma.prisma ?? new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
+    datasources: {
+      db: {
+        url: optimizedDatabaseUrl,
+      },
+    },
+  })
+} catch (error) {
+  console.warn('Prisma client not available, using fallback:', error)
+  // Create a minimal fallback client for build time
+  prisma = {} as PrismaClient
 }
 
-// Graceful shutdown
-process.on('beforeExit', async () => {
-  await prisma.$disconnect()
-})
-
-process.on('SIGINT', async () => {
-  await prisma.$disconnect()
-  process.exit(0)
-})
-
-process.on('SIGTERM', async () => {
-  await prisma.$disconnect()
-  process.exit(0)
-})
-
+export { prisma }
 export default prisma

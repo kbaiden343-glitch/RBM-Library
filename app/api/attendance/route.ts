@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     const where: any = {}
     
     if (memberId) {
-      where.memberId = memberId
+      where.personId = memberId
     }
     
     if (date) {
@@ -125,21 +125,21 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json(attendance, { status: 201 })
       } else if (memberId) {
-        // Member check-in
-        const member = await prisma.member.findUnique({
+        // Person check-in
+        const person = await prisma.person.findUnique({
           where: { id: memberId },
         })
 
-        if (!member) {
+        if (!person) {
           return NextResponse.json(
-            { error: 'Member not found' },
+            { error: 'Person not found' },
             { status: 404 }
           )
         }
 
-        if (member.status !== 'ACTIVE') {
+        if (person.personType !== 'MEMBER') {
           return NextResponse.json(
-            { error: 'Member is not active' },
+            { error: 'Person is not a member' },
             { status: 400 }
           )
         }
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
 
         const existingAttendance = await prisma.attendance.findFirst({
           where: {
-            memberId: memberId,
+            personId: memberId,
             checkInTime: {
               gte: startOfDay,
               lt: endOfDay,
@@ -170,11 +170,11 @@ export async function POST(request: NextRequest) {
         // Create member attendance record
         const attendance = await prisma.attendance.create({
           data: {
-            memberId: memberId,
+            personId: memberId,
             isVisitor: false,
           },
           include: {
-            member: true,
+            person: true,
           },
         })
 
@@ -218,7 +218,7 @@ export async function POST(request: NextRequest) {
         whereClause.personId = personId
       } else if (memberId) {
         // Legacy member check-out
-        whereClause.memberId = memberId
+        whereClause.personId = memberId
       } else if (visitorEmail) {
         // Legacy visitor check-out
         whereClause.visitorEmail = visitorEmail

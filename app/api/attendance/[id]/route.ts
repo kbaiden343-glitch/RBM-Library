@@ -9,7 +9,7 @@ export async function GET(
     const attendance = await prisma.attendance.findUnique({
       where: { id: params.id },
       include: {
-        member: true,
+        person: true,
       },
     })
 

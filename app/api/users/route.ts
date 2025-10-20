@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../lib/db'
-import { registerSchema } from '../../../lib/validations'
-import { verifyToken } from '../../../lib/auth'
+import { prisma } from '../../../../lib/db'
+import { registerSchema } from '../../../../lib/validations'
+import { verifyToken } from '../../../../lib/auth'
 import bcrypt from 'bcryptjs'
 
 export async function GET(request: NextRequest) {

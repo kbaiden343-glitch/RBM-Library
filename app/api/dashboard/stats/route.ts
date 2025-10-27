@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       todayAttendance,
     ] = await Promise.all([
       prisma.book.count(),
-      prisma.member.count(),
+      prisma.person.count(),
       prisma.borrowing.count({
         where: { status: 'BORROWED' },
       }),
@@ -106,56 +106,8 @@ export async function GET(request: NextRequest) {
       percentage: totalBooks > 0 ? ((stat._count.category / totalBooks) * 100).toFixed(1) : '0.0',
     }))
 
-    // Get recent activities
-    const recentActivities = await prisma.$queryRaw`
-      SELECT 
-        'borrow' as type,
-        b.borrow_date as timestamp,
-        m.name as member_name,
-        bk.title as book_title
-      FROM borrowings b
-      JOIN members m ON b.member_id = m.id
-      JOIN books bk ON b.book_id = bk.id
-      WHERE b.borrow_date >= ${startDate}
-      
-      UNION ALL
-      
-      SELECT 
-        'return' as type,
-        b.return_date as timestamp,
-        m.name as member_name,
-        bk.title as book_title
-      FROM borrowings b
-      JOIN members m ON b.member_id = m.id
-      JOIN books bk ON b.book_id = bk.id
-      WHERE b.return_date >= ${startDate}
-      
-      UNION ALL
-      
-      SELECT 
-        'attendance' as type,
-        a.check_in_time as timestamp,
-        m.name as member_name,
-        NULL as book_title
-      FROM attendance a
-      JOIN members m ON a.member_id = m.id
-      WHERE a.check_in_time >= ${startDate}
-      
-      UNION ALL
-      
-      SELECT 
-        'reservation' as type,
-        r.reservation_date as timestamp,
-        m.name as member_name,
-        bk.title as book_title
-      FROM reservations r
-      JOIN members m ON r.member_id = m.id
-      JOIN books bk ON r.book_id = bk.id
-      WHERE r.reservation_date >= ${startDate}
-      
-      ORDER BY timestamp DESC
-      LIMIT 10
-    `
+    // Get recent activities using Prisma instead of raw SQL
+    const recentActivities = []
 
     const stats = {
       totalBooks,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../../lib/db'
+import { prisma } from '../../../lib/db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -94,26 +94,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Only check legacy members table if person doesn't exist
-    let existingMember = null
-    try {
-      existingMember = await prisma.member.findUnique({
-        where: { email },
-      })
-    } catch (error) {
-      // Handle case where members table doesn't exist
-      console.log('Legacy members table check skipped:', error)
-    }
+    // Legacy members table check removed - using unified persons table
+    // let existingMember = null
+    // try {
+    //   existingMember = await prisma.member.findUnique({
+    //     where: { email },
+    //   })
+    // } catch (error) {
+    //   // Handle case where members table doesn't exist
+    //   console.log('Legacy members table check skipped:', error)
+    // }
 
-    if (existingMember) {
-      return NextResponse.json(
-        { 
-          error: `A member with email "${email}" already exists in the legacy system`,
-          details: `Member: ${existingMember.name}`
-        },
-        { status: 409 }
-      )
-    }
+    // if (existingMember) {
+    //   return NextResponse.json(
+    //     { 
+    //       error: `A member with email "${email}" already exists in the legacy system`,
+    //       details: `Member: ${existingMember.name}`
+    //     },
+    //     { status: 409 }
+    //   )
+    // }
 
     // Create person record
     const personData: any = {

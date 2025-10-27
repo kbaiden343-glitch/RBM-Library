@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../../lib/db'
+import { prisma } from '../../../lib/db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,29 +40,29 @@ export async function GET(request: NextRequest) {
       take: limit
     })
 
-    // Search in legacy members table (for backward compatibility)
-    const legacyMembers = await prisma.member.findMany({
-      where: {
-        OR: [
-          { name: { contains: searchTerm, mode: 'insensitive' } },
-          { email: { contains: searchTerm, mode: 'insensitive' } },
-          { phone: { contains: searchTerm, mode: 'insensitive' } }
-        ]
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        phone: true,
-        status: true,
-        membershipDate: true,
-        createdAt: true
-      },
-      orderBy: [
-        { name: 'asc' }
-      ],
-      take: limit
-    })
+    // Legacy members table search removed - using unified persons table
+    // const legacyMembers = await prisma.member.findMany({
+    //   where: {
+    //     OR: [
+    //       { name: { contains: searchTerm, mode: 'insensitive' } },
+    //       { email: { contains: searchTerm, mode: 'insensitive' } },
+    //       { phone: { contains: searchTerm, mode: 'insensitive' } }
+    //     ]
+    //   },
+    //   select: {
+    //     id: true,
+    //     name: true,
+    //     email: true,
+    //     phone: true,
+    //     status: true,
+    //     membershipDate: true,
+    //     createdAt: true
+    //   },
+    //   orderBy: [
+    //     { name: 'asc' }
+    //   ],
+    //   take: limit
+    // })
 
     // Search in users (staff/admin)
     const users = await prisma.user.findMany({
@@ -103,21 +103,21 @@ export async function GET(request: NextRequest) {
         subtitle: `${person.personType === 'MEMBER' ? 'Member' : 'Visitor'} • ${person.libraryId || 'No ID'} • ${person.email}`
       })),
       
-      // Legacy members
-      ...legacyMembers.map(member => ({
-        id: member.id,
-        name: member.name,
-        email: member.email,
-        phone: member.phone || '',
-        libraryId: '',
-        type: 'legacy_member',
-        status: member.status,
-        membershipDate: member.membershipDate,
-        createdAt: member.createdAt,
-        navigateTo: 'members',
-        displayType: 'Member (Legacy)',
-        subtitle: `Member (Legacy) • ${member.email}`
-      })),
+      // Legacy members processing removed
+      // ...legacyMembers.map(member => ({
+      //   id: member.id,
+      //   name: member.name,
+      //   email: member.email,
+      //   phone: member.phone || '',
+      //   libraryId: '',
+      //   type: 'legacy_member',
+      //   status: member.status,
+      //   membershipDate: member.membershipDate,
+      //   createdAt: member.createdAt,
+      //   navigateTo: 'members',
+      //   displayType: 'Member (Legacy)',
+      //   subtitle: `Member (Legacy) • ${member.email}`
+      // })),
       
       // System users
       ...users.map(user => ({

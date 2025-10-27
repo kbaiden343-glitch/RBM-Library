@@ -24,21 +24,18 @@ export async function POST(request: NextRequest) {
         prisma.borrowing.findMany({
           include: {
             book: true,
-            person: true,
-            member: true
+            person: true
           }
         }),
         prisma.reservation.findMany({
           include: {
             book: true,
-            person: true,
-            member: true
+            person: true
           }
         }),
         prisma.attendance.findMany({
           include: {
-            person: true,
-            member: true
+            person: true
           }
         }),
         prisma.settings.findFirst()
@@ -89,21 +86,18 @@ export async function POST(request: NextRequest) {
         prisma.borrowing.findMany({
           include: {
             book: true,
-            person: true,
-            member: true
+            person: true
           }
         }),
         prisma.reservation.findMany({
           include: {
             book: true,
-            person: true,
-            member: true
+            person: true
           }
         }),
         prisma.attendance.findMany({
           include: {
-            person: true,
-            member: true
+            person: true
           }
         }),
         prisma.settings.findFirst()

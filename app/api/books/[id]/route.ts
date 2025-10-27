@@ -11,10 +11,10 @@ export async function GET(
       where: { id: params.id },
       include: {
         borrowings: {
-          include: { member: true },
+          include: { person: true },
         },
         reservations: {
-          include: { member: true },
+          include: { person: true },
         },
       },
     })

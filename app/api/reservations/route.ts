@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '../../../../lib/db'
-import { reservationSchema } from '../../../../lib/validations'
+import { prisma } from '../../../lib/db'
+import { reservationSchema } from '../../../lib/validations'
 
 export async function GET(request: NextRequest) {
   try {

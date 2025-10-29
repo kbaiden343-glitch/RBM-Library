@@ -6,7 +6,8 @@ import { useAuth } from '../context/AuthContext'
 // Notification triggers for library events
 export const useLibraryNotifications = () => {
   const { sendNotification } = useNotifications()
-  const { user } = useAuth()
+  const { state } = useAuth()
+  const user = state.user
 
   // Send notification when a book is borrowed
   const notifyBookBorrowed = async (bookTitle: string, borrowerName: string, dueDate: string) => {

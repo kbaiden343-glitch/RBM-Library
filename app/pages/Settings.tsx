@@ -674,13 +674,32 @@ const Settings = () => {
           <p className="text-sm text-gray-600 mb-4">
             Test your notification settings to ensure they're working correctly.
           </p>
-          <button
-            onClick={handleTestNotification}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            <Bell className="h-4 w-4 mr-2" />
-            Send Test Notification
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={testEmailNotification}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Test Email
+            </button>
+            <button
+              onClick={testSMSNotification}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Test SMS
+            </button>
+            <button
+              onClick={async () => {
+                await requestNotificationPermission()
+                testPushNotification()
+              }}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Test Push
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -104,16 +104,18 @@ const Dashboard = () => {
       .sort((a, b) => new Date(b.borrowDate).getTime() - new Date(a.borrowDate).getTime())
       .slice(0, 5)
       .map(borrowing => {
+        if (!borrowing) return null
         const book = books.find(b => b.id === borrowing.bookId)
-        const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
+        const member = members.find(m => m.id === borrowing.personId)
         return {
           type: 'borrow',
           message: `${member?.name || 'Unknown'} borrowed "${book?.title || 'Unknown Book'}"`,
-          time: new Date(borrowing.borrowDate).toLocaleString(),
+          time: borrowing.borrowDate ? new Date(borrowing.borrowDate).toLocaleString() : 'Unknown',
           icon: BookMarked,
           color: 'text-blue-600'
         }
       })
+      .filter((activity): activity is NonNullable<typeof activity> => activity !== null)
 
     // Recent returns
     const recentReturns = borrowings
@@ -121,23 +123,26 @@ const Dashboard = () => {
       .sort((a, b) => new Date(b.returnDate!).getTime() - new Date(a.returnDate!).getTime())
       .slice(0, 3)
       .map(borrowing => {
+        if (!borrowing || !borrowing.returnDate) return null
         const book = books.find(b => b.id === borrowing.bookId)
-        const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
+        const member = members.find(m => m.id === borrowing.personId)
         return {
           type: 'return',
           message: `${member?.name || 'Unknown'} returned "${book?.title || 'Unknown Book'}"`,
-          time: new Date(borrowing.returnDate!).toLocaleString(),
+          time: new Date(borrowing.returnDate).toLocaleString(),
           icon: BookOpen,
           color: 'text-green-600'
         }
       })
+      .filter((activity): activity is NonNullable<typeof activity> => activity !== null)
 
     // Recent attendance
     const recentAttendance = attendance
       .sort((a, b) => new Date(b.checkInTime).getTime() - new Date(a.checkInTime).getTime())
       .slice(0, 3)
       .map(att => {
-        const member = members.find(m => m.id === att.memberId)
+        if (!att || !att.checkInTime) return null
+        const member = members.find(m => m.id === att.personId)
         return {
           type: 'attendance',
           message: `${member?.name || 'Unknown'} checked in`,
@@ -146,6 +151,7 @@ const Dashboard = () => {
           color: 'text-purple-600'
         }
       })
+      .filter((activity): activity is NonNullable<typeof activity> => activity !== null)
 
     activities.push(...recentBorrowings, ...recentReturns, ...recentAttendance)
     setRecentActivities(activities.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).slice(0, 8))
@@ -202,8 +208,7 @@ const Dashboard = () => {
         const member = members[0]
         if (member) {
           addAttendance({ 
-            personId: member.id,
-            memberId: member.id 
+            personId: member.id
           })
         }
       },

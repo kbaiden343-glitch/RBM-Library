@@ -26,18 +26,20 @@ const BorrowingSystem = () => {
 
   // Filter borrowings based on search term
   const filteredBorrowings = activeBorrowings.filter(borrowing => {
+    if (!borrowing) return false
+    
     const book = books.find(b => b.id === borrowing.bookId)
-    const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
+    const member = members.find(m => m.id === borrowing.personId)
     
     if (!searchTerm) return true
     
     const searchLower = searchTerm.toLowerCase()
     return (
-      book?.title.toLowerCase().includes(searchLower) ||
-      book?.author.toLowerCase().includes(searchLower) ||
-      member?.name.toLowerCase().includes(searchLower) ||
-      member?.email.toLowerCase().includes(searchLower) ||
-      borrowing.id.toLowerCase().includes(searchLower)
+      book?.title?.toLowerCase().includes(searchLower) ||
+      book?.author?.toLowerCase().includes(searchLower) ||
+      member?.name?.toLowerCase().includes(searchLower) ||
+      member?.email?.toLowerCase().includes(searchLower) ||
+      borrowing.id?.toLowerCase().includes(searchLower)
     )
   })
 
@@ -165,7 +167,7 @@ const BorrowingSystem = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredBorrowings.map((borrowing) => {
                 const book = books.find(b => b.id === borrowing.bookId)
-                const member = members.find(m => m.id === (borrowing.memberId || borrowing.personId))
+                const member = members.find(m => m.id === borrowing.personId)
                 const isOverdue = new Date(borrowing.dueDate) < new Date()
                 
                 return (

@@ -57,7 +57,8 @@ const UserManagement = () => {
       if (response.error) {
         toast.error(response.error)
       } else {
-        setUsers(response.data?.users || [])
+        const usersData = (response.data as { users?: User[] })?.users || []
+        setUsers(usersData)
       }
     } catch (error) {
       console.error('Error fetching users:', error)
@@ -74,7 +75,8 @@ const UserManagement = () => {
       if (response.error) {
         toast.error(response.error)
       } else {
-        setUsers([response.data, ...users])
+        const newUser = response.data as User
+        setUsers([newUser, ...users])
         setShowAddModal(false)
         toast.success('User created successfully!')
       }
@@ -93,7 +95,8 @@ const UserManagement = () => {
       if (response.error) {
         toast.error(response.error)
       } else {
-        setUsers(users.map(u => u.id === response.data.id ? response.data : u))
+        const updatedUser = response.data as User
+        setUsers(users.map(u => u.id === updatedUser.id ? updatedUser : u))
         setEditingUser(null)
         toast.success('User updated successfully!')
       }

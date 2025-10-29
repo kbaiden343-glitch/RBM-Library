@@ -40,38 +40,67 @@ class NotificationService {
 
   // Check if notifications are enabled for a specific channel
   isChannelEnabled(channel: keyof NotificationChannel): boolean {
-    return this.settings[channel] || false
+    if (!this.settings || !channel) return false
+    return Boolean(this.settings[channel]) || false
   }
 
   // Check if a specific notification type is enabled
   isNotificationEnabled(type: keyof NotificationSettings): boolean {
-    return this.settings[type] || false
+    if (!this.settings || !type) return false
+    // Skip checking complex objects like quietHours, emailSettings, and frequency
+    if (type === 'quietHours' || type === 'emailSettings' || type === 'frequency') {
+      return false
+    }
+    return Boolean(this.settings[type]) || false
   }
 
   // Check if we're in quiet hours
   isInQuietHours(): boolean {
-    if (!this.settings.quietHours.enabled) return false
-
-    const now = new Date()
-    const currentTime = now.getHours() * 60 + now.getMinutes()
+    if (!this.settings.quietHours?.enabled) return false
     
-    const [startHour, startMin] = this.settings.quietHours.start.split(':').map(Number)
-    const [endHour, endMin] = this.settings.quietHours.end.split(':').map(Number)
-    
-    const startTime = startHour * 60 + startMin
-    const endTime = endHour * 60 + endMin
+    if (!this.settings.quietHours.start || !this.settings.quietHours.end) return false
 
-    // Handle overnight quiet hours (e.g., 22:00 to 08:00)
-    if (startTime > endTime) {
-      return currentTime >= startTime || currentTime <= endTime
+    try {
+      const now = new Date()
+      const currentTime = now.getHours() * 60 + now.getMinutes()
+      
+      const startParts = this.settings.quietHours.start.split(':')
+      const endParts = this.settings.quietHours.end.split(':')
+      
+      if (startParts.length !== 2 || endParts.length !== 2) return false
+      
+      const startHour = Number(startParts[0])
+      const startMin = Number(startParts[1])
+      const endHour = Number(endParts[0])
+      const endMin = Number(endParts[1])
+      
+      if (isNaN(startHour) || isNaN(startMin) || isNaN(endHour) || isNaN(endMin)) {
+        return false
+      }
+      
+      const startTime = startHour * 60 + startMin
+      const endTime = endHour * 60 + endMin
+
+      // Handle overnight quiet hours (e.g., 22:00 to 08:00)
+      if (startTime > endTime) {
+        return currentTime >= startTime || currentTime <= endTime
+      }
+      
+      return currentTime >= startTime && currentTime <= endTime
+    } catch (error) {
+      console.error('Error checking quiet hours:', error)
+      return false
     }
-    
-    return currentTime >= startTime && currentTime <= endTime
   }
 
   // Send email notification
   async sendEmailNotification(to: string, subject: string, message: string): Promise<boolean> {
     if (!this.isChannelEnabled('email') || this.isInQuietHours()) {
+      return false
+    }
+
+    if (!to || !subject || !message) {
+      console.warn('Email notification missing required fields')
       return false
     }
 
@@ -101,6 +130,11 @@ class NotificationService {
       return false
     }
 
+    if (!to || !message) {
+      console.warn('SMS notification missing required fields')
+      return false
+    }
+
     try {
       // In a real implementation, you would integrate with an SMS service like Twilio
       console.log(`📱 SMS sent to ${to}: ${message}`)
@@ -126,6 +160,11 @@ class NotificationService {
     }
 
     try {
+      // Check if we're in a browser environment
+      if (typeof window === 'undefined') {
+        return false
+      }
+      
       // Check if browser supports notifications
       if (!('Notification' in window)) {
         console.warn('This browser does not support notifications')
@@ -142,14 +181,20 @@ class NotificationService {
       }
 
       if (Notification.permission === 'granted') {
-        const notification = new Notification(title, {
-          body: message,
+        const notification = new Notification(title || 'Notification', {
+          body: message || '',
           icon: '/favicon.ico',
           data: data
         })
 
         // Auto-close after 5 seconds
-        setTimeout(() => notification.close(), 5000)
+        setTimeout(() => {
+          try {
+            notification.close()
+          } catch (error) {
+            // Notification may have already been closed
+          }
+        }, 5000)
         
         return true
       }

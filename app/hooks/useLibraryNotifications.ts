@@ -35,7 +35,7 @@ export const useLibraryNotifications = () => {
       'overdueAlerts',
       '⚠️ Book Overdue',
       `"${bookTitle}" borrowed by ${borrowerName} is ${daysOverdue} days overdue`,
-      { email: user?.email, phone: user?.phone }
+      { email: user?.email }
     )
   }
 
@@ -65,7 +65,7 @@ export const useLibraryNotifications = () => {
       'reservations',
       '✅ Reservation Ready',
       `"${bookTitle}" is now available for ${borrowerName}`,
-      { email: user?.email, phone: user?.phone }
+      { email: user?.email }
     )
   }
 
@@ -95,7 +95,7 @@ export const useLibraryNotifications = () => {
       type,
       `🔔 ${title}`,
       message,
-      { email: user?.email, phone: user?.phone }
+      { email: user?.email }
     )
   }
 

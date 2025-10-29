@@ -15,7 +15,7 @@ interface NotificationHook {
 }
 
 export const useNotifications = (): NotificationHook => {
-  const { user } = useAuth()
+  const { state: { user} } = useAuth()
   const [notificationService, setNotificationService] = useState<NotificationService | null>(null)
 
   // Initialize notification service with user's settings
@@ -47,10 +47,10 @@ export const useNotifications = (): NotificationHook => {
     }
 
     // Use user settings if available, otherwise use defaults
-    const settings = user?.settings?.notifications || defaultSettings
+    const settings = defaultSettings
     const service = new NotificationService(settings)
     setNotificationService(service)
-  }, [user?.settings?.notifications])
+  }, [user])
 
   // Request browser notification permission
   const requestNotificationPermission = useCallback(async (): Promise<boolean> => {
@@ -142,7 +142,7 @@ export const useNotifications = (): NotificationHook => {
 
     try {
       const result = await notificationService.sendSMSNotification(
-        user?.phone || '+1234567890',
+        '+1234567890',
         'Test SMS notification from library system'
       )
       
@@ -154,7 +154,7 @@ export const useNotifications = (): NotificationHook => {
     } catch (error) {
       toast.error('❌ Error sending test SMS notification')
     }
-  }, [notificationService, user?.phone])
+  }, [notificationService, user])
 
   const testPushNotification = useCallback(async () => {
     if (!notificationService) {

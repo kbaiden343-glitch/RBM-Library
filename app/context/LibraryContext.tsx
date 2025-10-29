@@ -530,7 +530,6 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
         const attendancePayload = {
           action: 'check-in',
           personId: attendance.personId,
-          memberId: attendance.memberId,
           visitorName: attendance.visitorName,
           visitorEmail: attendance.visitorEmail,
           visitorPhone: attendance.visitorPhone
@@ -554,7 +553,7 @@ export const LibraryProvider = ({ children }: { children: React.ReactNode }) => 
     },
     // AI Recommendation
     getRecommendations: (memberId: string) => {
-      const memberBorrowings = state.borrowings.filter(b => b.memberId === memberId)
+      const memberBorrowings = state.borrowings.filter(b => b.personId === memberId)
       const borrowedBooks = memberBorrowings.map(b => 
         state.books.find(book => book.id === b.bookId)
       ).filter(Boolean) as Book[]

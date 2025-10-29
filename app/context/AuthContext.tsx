@@ -13,6 +13,16 @@ interface User {
   permissions: string[]
 }
 
+interface AuthResponse {
+  user: {
+    id: string
+    name: string
+    email: string
+    role: string
+  }
+  token: string
+}
+
 interface AuthState {
   user: User | null
   isAuthenticated: boolean
@@ -138,12 +148,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch({ type: 'LOGIN_START' })
 
     try {
-      const response = await apiClient.post('/api/auth/login', { email, password })
+      const response = await apiClient.post<AuthResponse>('/api/auth/login', { email, password })
 
       if (response.error) {
         dispatch({ type: 'LOGIN_FAILURE', payload: response.error })
         toast.error(response.error)
-      } else {
+      } else if (response.data) {
         const user = {
           ...response.data.user,
           permissions: getPermissions(response.data.user.role)
@@ -164,12 +174,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     dispatch({ type: 'LOGIN_START' })
 
     try {
-      const response = await apiClient.post('/api/auth/register', { name, email, password, role })
+      const response = await apiClient.post<AuthResponse>('/api/auth/register', { name, email, password, role })
 
       if (response.error) {
         dispatch({ type: 'LOGIN_FAILURE', payload: response.error })
         toast.error(response.error)
-      } else {
+      } else if (response.data) {
         const user = {
           ...response.data.user,
           permissions: getPermissions(response.data.user.role)

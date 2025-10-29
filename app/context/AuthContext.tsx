@@ -18,7 +18,7 @@ interface AuthResponse {
     id: string
     name: string
     email: string
-    role: string
+    role: 'ADMIN' | 'LIBRARIAN' | 'MEMBER'
   }
   token: string
 }
